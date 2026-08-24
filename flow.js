@@ -200,13 +200,15 @@ async function flow(){
   await sarah('Now we practise it live. As a first step, I want you to handle the very first situation you said you wanted to win.');
   await sarah('You’re about to meet someone.');
   await wait(400);
-  await managerSays('Hi, I’m Miguel. Today, I’ll be acting as your manager. Come find me when you’re ready.');
+  await managerSays('Hi, I’m Miguel. I’ll be playing your manager today. No pressure, it’s just us practising.');
   await wait(300);
-  await sarah('Before you walk in: do you want me to teach you how to handle him, or will you try it yourself?');
-  const LEARN = { v:'learn', label:'Teach me how to handle it',
-                  desc:'Learn it in 4 steps, then say it.' };
-  const TRY   = { v:'try',   label:'I’ll try it myself',
-                  desc:'Answer your way. A hint is there if you want it.' };
+  await sarah('That’s the conversation most people rehearse in their head for days. Today you actually get to try it.');
+  await sarah('And nothing here counts. Nobody hears you but me.');
+  await sarah('So, how do you want to go in?');
+  const LEARN = { v:'learn', label:'Walk me through it first',
+                  desc:'Learn a simple 4-step answer, then say it.' };
+  const TRY   = { v:'try',   label:'Let me just try',
+                  desc:'Speak your way. A hint is one tap away.' };
   A.mode = await options(A.level === 'beginner' ? [LEARN, TRY] : [TRY, LEARN], DBG.mode || (A.level === 'beginner' ? 'learn' : 'try'));
 
   /* the story */
