@@ -1,0 +1,108 @@
+/* ============================================================
+   Activation v3 — the moment, in chat.
+   Judge bubble · meet card · USA scaffold card · docked mic.
+   ============================================================ */
+
+/* the judge speaks: same anatomy as Sarah, gold voice */
+.msg.judge .dp{border-color:color-mix(in srgb,var(--progress) 55%,transparent)}
+.msg.judge .bubble{border-color:color-mix(in srgb,var(--progress) 40%,transparent);
+  box-shadow:inset 0 0 40px color-mix(in srgb,var(--progress) 7%,transparent)}
+.judge-name{font-family:var(--font-display);font-size:12px;font-weight:600;
+  letter-spacing:.08em;text-transform:uppercase;color:var(--progress);margin-bottom:5px}
+.judge-ctx{font-family:var(--font-display);font-size:13px;color:var(--text-low);margin-bottom:4px}
+
+/* the meet card: who you're about to face */
+.meet-card{
+  align-self:stretch;display:flex;align-items:center;gap:13px;
+  border-radius:18px;padding:14px 16px;margin:2px 0;
+  background:color-mix(in srgb,var(--progress) 8%,transparent);
+  border:1px solid color-mix(in srgb,var(--progress) 30%,transparent);
+  animation:msg-in .45s var(--ease-out) both;
+}
+.meet-card img{width:52px;height:52px;border-radius:50%;object-fit:cover;flex:none;
+  border:2px solid color-mix(in srgb,var(--progress) 55%,transparent)}
+.meet-n{font-family:var(--font-display);font-weight:700;font-size:15.5px;color:var(--text-hi)}
+.meet-r{font-family:var(--font-display);font-size:12.5px;color:var(--text-low);margin-top:2px}
+
+/* ---------- the USA scaffold card, chat-width ---------- */
+.scaf-card{
+  align-self:stretch;margin:2px 0;border-radius:18px;padding:4px 16px;
+  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.10);
+  display:flex;flex-direction:column;
+  animation:msg-in .45s var(--ease-out) both;
+}
+.scaf-card .seg{padding:11px 0;border-bottom:1px solid rgba(255,255,255,.07);
+  transition:opacity .3s var(--ease-out)}
+.scaf-card .seg:last-child{border-bottom:none}
+.scaf-card .seg[hidden]{display:none}
+.scaf-card .seg .st{display:block;font-family:var(--font-display);font-weight:600;
+  font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--text-low);
+  margin:0 0 3px;transition:color .3s}
+.scaf-card .seg p{margin:0;font-family:var(--font-display);font-size:15.5px;
+  line-height:1.42;color:var(--text-mid);transition:color .3s}
+.scaf-card .seg.cur .st{color:var(--blue-300)}
+.scaf-card .seg.cur p{color:var(--text-hi)}
+.scaf-card .seg.dim{opacity:.35}
+.scaf-prog{width:auto;height:5px;border-radius:999px;background:rgba(255,255,255,.10);
+  margin:10px 0 12px;overflow:hidden}
+.scaf-prog i{display:block;height:100%;width:0;border-radius:inherit;
+  background:linear-gradient(90deg,var(--blue-600),var(--blue-300));
+  transition:width .45s var(--ease-out)}
+
+/* readmode: the scaffold becomes the passage they read */
+.scaf-card.readmode{
+  background:var(--read-bg);border-color:var(--read-border);
+  box-shadow:var(--read-glow);padding:18px 19px;
+}
+.scaf-card.readmode .rd-label{font-family:var(--font-display);font-weight:700;
+  font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;
+  color:var(--read-label);margin-bottom:9px}
+.scaf-card.readmode .rd-text{margin:0;font-family:var(--font-display);font-weight:500;
+  font-size:16.5px;line-height:1.7;color:var(--read-rest)}
+.scaf-card.readmode .rd-text .said{color:var(--read-said)}
+
+/* ---------- the docked mic ---------- */
+.mic-area{position:absolute;left:0;right:0;bottom:0;height:210px;z-index:8;
+  background:linear-gradient(to top,var(--bg) 55%,transparent);
+  display:flex;flex-direction:column;align-items:center;justify-content:flex-end;
+  padding-bottom:28px;transition:opacity .35s}
+.mic-area.gone{opacity:0;pointer-events:none}
+.mic-tip{font-family:var(--font-display);font-size:13.5px;color:var(--text-low);
+  margin-bottom:12px;transition:opacity .25s}
+.mic-tip.hidden{opacity:0}
+.mic-orb{position:relative;width:72px;height:72px;border-radius:50%;cursor:pointer;user-select:none;
+  background:linear-gradient(180deg,var(--blue-300),var(--accent));
+  display:grid;place-items:center;
+  box-shadow:0 0 0 9px color-mix(in srgb,var(--accent) 10%,transparent),
+             0 10px 26px -10px color-mix(in srgb,var(--accent) 45%,transparent);
+  transition:width .35s,border-radius .35s}
+.mic-orb svg{width:28px;height:28px;color:#fff}
+.mic-orb .wave,.mic-orb .x,.mic-orb .ok{display:none}
+.mic-orb.live{width:260px;border-radius:40px}
+.mic-orb.live>svg{display:none}
+.mic-orb.live .wave{display:flex;align-items:center;gap:3px;height:30px}
+.mic-orb .wave span{width:4px;height:22%;border-radius:2px;background:#fff;transition:height .1s}
+.mic-orb.live .x,.mic-orb.live .ok{display:grid;place-items:center;position:absolute;top:50%;
+  transform:translateY(-50%);width:36px;height:36px;border-radius:50%;border:0;cursor:pointer;
+  font-family:var(--font-display);font-size:14px;font-weight:700}
+.mic-orb.live .x{left:9px;background:rgba(0,0,0,.25);color:rgba(255,255,255,.85)}
+.mic-orb.live .ok{right:9px;background:#fff;color:var(--accent)}
+.mic-timer{margin-top:10px;font-family:var(--font-display);font-weight:600;font-size:13px;
+  letter-spacing:.04em;color:var(--progress);font-variant-numeric:tabular-nums;
+  opacity:0;transition:opacity .25s}
+.mic-timer.on{opacity:1}
+.mic-escape{margin-top:7px;border:0;background:none;cursor:pointer;
+  font-family:var(--font-display);font-size:13px;color:var(--text-faint);
+  text-decoration:underline;text-underline-offset:3px}
+.mic-escape:hover{color:var(--text-low)}
+.mic-escape.gone{visibility:hidden}
+
+/* the hint pill, beside the orb (try path) */
+.mic-hint{position:absolute;left:calc(50% + 66px);bottom:72px;
+  display:flex;align-items:center;gap:6px;border:0;cursor:pointer;border-radius:999px;
+  padding:10px 15px;background:rgba(255,255,255,.07);
+  border:1px solid rgba(255,255,255,.14);color:var(--blue-300);
+  font-family:var(--font-display);font-weight:600;font-size:13px;
+  transition:opacity .25s}
+.mic-hint.gone{opacity:0;pointer-events:none}
+.mic-hint b{font-size:15px}

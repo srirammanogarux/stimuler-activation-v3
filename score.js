@@ -12,26 +12,39 @@ const SCORE = {
   manager:  { read:74, speak:58,
     drill:[{ w:'Friday',  ph:'/ˈfraɪ.deɪ/', from:54 }, { w:'wedding', ph:'/ˈwed.ɪŋ/', from:51 }],
     report:  [true, true, false, false],
-    value:   'Five minutes ago this conversation made you nervous. You just handled it.',
-    wk1:     'Manager conversations: leave, deadlines, updates' },
+    value:   'Five minutes ago this conversation made you nervous. You just handled it.' },
   meetings: { read:72, speak:55,
     drill:[{ w:'option',  ph:'/ˈɒp.ʃən/', from:53 }, { w:'earlier', ph:'/ˈɜː.li.ər/', from:50 }],
     report:  [true, true, false, false],
-    value:   'You just did the thing you never do in meetings. You said it first.',
-    wk1:     'Meetings: taking a position and holding it' },
+    value:   'You just did the thing you never do in meetings. You said it first.' },
   present:  { read:75, speak:56,
     drill:[{ w:'losing', ph:'/ˈluː.zɪŋ/', from:55 }, { w:'statuses', ph:'/ˈsteɪ.təs.ɪz/', from:52 }],
     report:  [true, true, false, false],
-    value:   'That’s the first time your work got the words it deserves.',
-    wk1:     'Presenting your work the way it deserves' },
+    value:   'That’s the first time your work got the words it deserves.' },
 };
 const WORD_LIFT = 6;   /* the top score climbs this much per fixed word */
 
-const JOURNEY_TAIL = [
-  { wk:'Week 3', what:'Holding your own in any room at work' },
-  { wk:'Week 5', what:'Thinking in English, not translating' },
-  { wk:'Week 8', what:'Walking in with something to say, every time' },
-];
+/* the plan screen, USA anatomy: title, trajectory, checks, scenarios */
+const PLAN = {
+  manager: {
+    title: 'Eight weeks to <em>ask without rehearsing</em>',
+    checks: ['Asking for time off', 'Deadline conversations', 'Giving clear updates', 'Pushing back politely'],
+    done:   'Talking to your manager',
+    next:   'Speaking up in meetings · Presenting my work',
+  },
+  meetings: {
+    title: 'Eight weeks to <em>a voice the room waits for</em>',
+    checks: ['Taking a position', 'Disagreeing without friction', 'Thinking aloud clearly', 'Bringing the room with you'],
+    done:   'Speaking up in meetings',
+    next:   'Talking to my manager · Presenting my work',
+  },
+  present: {
+    title: 'Eight weeks to <em>presenting without freezing</em>',
+    checks: ['Opening strong', 'Explaining the impact', 'Handling questions', 'Closing with next steps'],
+    done:   'Presenting your work',
+    next:   'Talking to my manager · Speaking up in meetings',
+  },
+};
 
 window.playScore = function({ room, path, hintUsed, frame, name }){
   return new Promise(resolve => {
@@ -90,7 +103,7 @@ window.playScore = function({ room, path, hintUsed, frame, name }){
     $('scDrillZone').innerHTML = '';
 
     /* ---- show + count the base score ---- */
-    ['momentScreen','scoreScreen'].forEach(s =>
+    ['chatScreen','storyScreen','scoreScreen'].forEach(s =>
       $(s).classList.toggle('is-hidden', s !== 'scoreScreen'));
     setTimeout(() => setScore(base), 400);
 
@@ -162,19 +175,22 @@ window.playScore = function({ room, path, hintUsed, frame, name }){
     }
     setTimeout(pronCard, 1400);
 
-    /* ---- journey → paywall ---- */
+    /* ---- the plan → paywall ---- */
     $('scCta').addEventListener('click', () => {
-      const rows = [{ wk:'Week 1', what: sc.wk1 }, ...JOURNEY_TAIL];
-      $('jnTitle').innerHTML = `You took the first step<br>five minutes ago${name ? ', ' + name : ''}.`;
-      $('jnRows').innerHTML = rows.map((j, i) => `
-        <div class="jn-row ${i === 0 ? 'lit' : ''}"><div class="jn-dot"></div>
-        <div><p class="jn-wk">${j.wk}</p><p class="jn-what">${j.what}</p></div></div>`).join('');
-      ['scoreScreen','journeyScreen'].forEach(s =>
-        $(s).classList.toggle('is-hidden', s !== 'journeyScreen'));
+      const pl = PLAN[room] || PLAN.manager;
+      $('plEyebrow').textContent = name ? `Your plan, ${name}` : 'Your plan';
+      $('plTitle').innerHTML = pl.title;
+      $('plSub').textContent = 'Built from what you showed today.';
+      $('plFrom').textContent = `Today · ${score}%`;
+      $('plChecks').innerHTML = pl.checks.map(c => `<li>${c}</li>`).join('');
+      $('plDone').insertAdjacentText('beforeend', pl.done);
+      $('plNext').textContent = pl.next;
+      ['scoreScreen','planScreen'].forEach(s =>
+        $(s).classList.toggle('is-hidden', s !== 'planScreen'));
     }, { once:true });
 
-    $('jnCta').addEventListener('click', () => {
-      ['journeyScreen','payScreen'].forEach(s =>
+    $('plCta').addEventListener('click', () => {
+      ['planScreen','payScreen'].forEach(s =>
         $(s).classList.toggle('is-hidden', s !== 'payScreen'));
       resolve();
     }, { once:true });

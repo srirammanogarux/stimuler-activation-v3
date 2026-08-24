@@ -8,7 +8,7 @@
 <link rel="stylesheet" href="tokens.css">
 <link rel="stylesheet" href="styles.css">
 <link rel="stylesheet" href="story.css">
-<link rel="stylesheet" href="moment.css">
+<link rel="stylesheet" href="chatmoment.css">
 <link rel="stylesheet" href="score.css">
 </head>
 <body>
@@ -42,6 +42,20 @@
           Skip <img src="assets/chevron-dbl.svg" alt="">
         </button>
       </footer>
+
+      <!-- the docked mic (the moment happens in chat) -->
+      <div class="mic-area gone" id="micArea">
+        <p class="mic-tip" id="micTip">Tap to speak</p>
+        <div class="mic-orb" id="micOrb" role="button" tabindex="0" aria-label="Speak">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/><line x1="12" y1="18" x2="12" y2="22"/></svg>
+          <div class="wave" id="micWave"></div>
+          <button class="x" id="micX" aria-label="Cancel">✕</button>
+          <button class="ok" id="micOk" aria-label="Done">✓</button>
+        </div>
+        <p class="mic-timer" id="micTimer">0.0s</p>
+        <button class="mic-escape" id="micEscape">I can’t speak right now</button>
+        <button class="mic-hint gone" id="micHint"><b>💡</b> Hint</button>
+      </div>
 
       <div class="home-indicator"></div>
     </main>
@@ -96,60 +110,6 @@
       </div>
     </section>
 
-    <!-- ============ THE MOMENT · full-screen speaking task ============ -->
-    <section class="screen moment-screen is-hidden" id="momentScreen">
-      <div class="mo-inner" id="moInner">
-        <p class="mo-eyebrow" id="moEyebrow"></p>
-        <div class="mo-asker">
-          <img src="assets/manager.png" alt="">
-          <div><p class="mo-an">The Manager</p><p class="mo-ar" id="moRole"></p></div>
-        </div>
-        <div class="mo-bub">
-          <span class="mo-ctx" id="moCtx"></span>
-          <span class="mo-q" id="moQ"></span>
-        </div>
-
-        <div class="mo-frame" id="moFrame">
-          <p class="mo-ft">How to answer · 4 steps</p>
-          <ul class="mo-steps" id="moSteps"></ul>
-        </div>
-
-        <!-- beginner phase 1: one step at a time -->
-        <div class="mo-teach gone" id="moTeach">
-          <p class="mo-tn" id="moTeachN">Step 1 of 4</p>
-          <div class="mo-tcard">
-            <p class="mo-ts" id="moTeachS"></p>
-            <p class="mo-th" id="moTeachH"></p>
-            <p class="mo-tsample" id="moTeachT"></p>
-          </div>
-          <button class="mo-tnext" id="moTeachNext">Next</button>
-        </div>
-
-        <!-- beginner phase 2: the four steps, collapsed -->
-        <div class="mo-chips gone" id="moChips"></div>
-
-        <div class="mo-read" id="moRead">
-          <p class="mo-rl">Your answer — read it out loud</p>
-          <p class="mo-rt" id="moRt"></p>
-        </div>
-
-        <div class="mo-mic-row">
-          <p class="mo-tip" id="moTip"></p>
-          <div class="mo-orb" id="moOrb" role="button" tabindex="0" aria-label="Speak">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/><line x1="12" y1="18" x2="12" y2="22"/></svg>
-            <div class="wave" id="moWave"></div>
-            <button class="x" id="moX" aria-label="Cancel">✕</button>
-            <button class="ok" id="moOk" aria-label="Done">✓</button>
-          </div>
-          <p class="mo-timer" id="moTimer">0.0s</p>
-          <button class="mo-escape" id="moEscape">I can’t speak right now</button>
-          <button class="mo-bulb" id="moBulb" aria-label="Hints">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 1 3.6 10.8c-.5.4-.6 1-.6 1.7v.5H9v-.5c0-.7-.1-1.3-.6-1.7A6 6 0 0 1 12 3Z"/></svg>
-          </button>
-        </div>
-      </div>
-    </section>
-
     <!-- ============ SCORE · India report anatomy ============ -->
     <section class="screen score-screen is-hidden" id="scoreScreen">
       <div class="sc-inner">
@@ -162,17 +122,44 @@
         <p class="hs-state" id="scState"></p>
         <div id="scDrillZone"></div>
         <p class="sc-value is-off" id="scValue"></p>
-        <button class="sc-cta is-off" id="scCta">See my journey</button>
+        <button class="sc-cta is-off" id="scCta">See my plan</button>
       </div>
     </section>
 
-    <!-- ============ JOURNEY ============ -->
-    <section class="screen journey-screen is-hidden" id="journeyScreen">
-      <div class="jn-inner">
-        <p class="sc-eyebrow">Your next 8 weeks</p>
-        <h2 class="jn-title" id="jnTitle"></h2>
-        <div class="jn-rows" id="jnRows"></div>
-        <button class="jn-cta" id="jnCta">I’m ready</button>
+    <!-- ============ THE PLAN · USA anatomy ============ -->
+    <section class="screen plan-screen is-hidden" id="planScreen">
+      <div class="pl-inner">
+        <p class="sc-eyebrow" id="plEyebrow">Your plan</p>
+        <h2 class="pl-title" id="plTitle"></h2>
+        <p class="pl-sub" id="plSub"></p>
+
+        <div class="pl-card">
+          <p class="pl-ch">Where you’re headed</p>
+          <svg class="pl-traj" viewBox="0 0 300 120" aria-hidden="true">
+            <path id="plCurve" d="M10,100 C90,96 180,70 290,18" fill="none"
+              stroke="url(#plGold)" stroke-width="3.5" stroke-linecap="round"/>
+            <defs><linearGradient id="plGold" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0" stop-color="#8B84FF"/><stop offset="1" stop-color="#E7B455"/>
+            </linearGradient></defs>
+            <circle cx="10" cy="100" r="5" fill="#8B84FF"/>
+            <circle cx="290" cy="18" r="6" fill="#E7B455"/>
+          </svg>
+          <div class="pl-axis"><span id="plFrom">Today</span><span>Week 8</span></div>
+        </div>
+
+        <div class="pl-card">
+          <p class="pl-ch">What you’ll nail</p>
+          <ul class="pl-checks" id="plChecks"></ul>
+        </div>
+
+        <div class="pl-card pl-jtbd">
+          <p class="pl-ch">Your scenarios</p>
+          <div class="pl-done" id="plDone"></div>
+          <p class="pl-next-label">Up next</p>
+          <p class="pl-next" id="plNext"></p>
+        </div>
+
+        <button class="sc-cta" id="plCta">See my plan options</button>
       </div>
     </section>
 

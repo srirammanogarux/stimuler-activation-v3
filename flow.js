@@ -15,7 +15,7 @@ const chatStream = $('chatStream');
 const chatScroll = $('chatScroll');
 
 /* the answers */
-const A = { lang:null, name:null, goal:null, situation:null, room:null, level:null, win:null };
+const A = { lang:null, name:null, goal:null, situation:null, room:null, level:null, mode:null, path:null };
 
 /* ---------- primitives (unchanged from the approved shell) ---------- */
 function scrollToEnd(){
@@ -165,20 +165,202 @@ async function flow(){
     { v:'advanced',     label:'Advanced',     desc:'I can hold a short conversation and understand others.' },
   ]);
 
+  /* meet the character, and choose how to play it */
+  const mo = window.momentData(A.room);
+  setProgress(92, 'Almost ready');
+  await sarah(`Perfect, ${A.name}. You’re about to meet someone.`);
+  chatStream.appendChild(el(`<div class="meet-card">
+    <img src="assets/manager.png" alt="">
+    <div><p class="meet-n">${mo.role.replace('Your','Your ')}</p><p class="meet-r">${mo.eyebrow} · ${mo.where}</p></div>
+  </div>`));
+  scrollToEnd();
+  await wait(900);
+  await sarah('How do you want to play it?');
+  const LEARN = { v:'learn', label:'Teach me a good answer first',
+                  desc:'Learn it in 4 steps, then say it to him.' };
+  const TRY   = { v:'try',   label:'Let me try it myself',
+                  desc:'Answer your way. Hints are there if you want them.' };
+  A.mode = await options(A.level === 'beginner' ? [LEARN, TRY] : [TRY, LEARN]);
+
   /* the story */
   setProgress(100, 'Your first scenario');
-  await sarah(`Perfect, ${A.name}. Let’s make your first scenario real.`);
   await window.playStory(A.room);
 
-  /* the moment */
-  const result = await window.playMoment(A.room, A.level);
+  /* the moment, in chat */
+  const result = await chatMoment(mo, A.mode);
   A.path = result.path;
 
-  /* the score → journey → paywall */
+  /* the score → plan → paywall */
   await window.playScore({
     room: A.room, path: A.path, hintUsed: result.hintUsed,
-    frame: window.momentFrame(A.room), name: A.name,
+    frame: mo.frame, name: A.name,
   });
+}
+
+/* ============================================================
+   THE MOMENT, IN CHAT
+   ============================================================ */
+async function judgeSays(mo){
+  dimLast();
+  const row = el(`<div class="msg judge"><div class="dp"><img src="assets/manager.png" alt=""></div>
+    <div class="bubble"><p class="judge-name">${mo.role}</p>
+    <p class="judge-ctx">${mo.ctx}</p><p><b>${mo.q}</b></p></div></div>`);
+  chatStream.appendChild(row); scrollToEnd();
+  await wait(1700);
+}
+
+function makeScaffold(mo){
+  const card = el(`<div class="scaf-card">` + mo.frame.map(f =>
+    `<div class="seg" hidden><span class="st">${f.s}</span><p>${f.t}</p></div>`).join('') +
+    `<div class="scaf-prog"><i></i></div></div>`);
+  chatStream.appendChild(card); scrollToEnd();
+  let n = 0;
+  return {
+    card,
+    reveal(){
+      const segs = [...card.querySelectorAll('.seg')];
+      if (n >= segs.length) return true;
+      segs.forEach(sg => sg.classList.remove('cur'));
+      segs[n].hidden = false;
+      segs[n].classList.add('cur');
+      card.querySelector('.scaf-prog i').style.width = (++n / segs.length * 100) + '%';
+      scrollToEnd();
+      return n >= segs.length;
+    },
+    toRead(){
+      const text = mo.frame.map(f => f.t).join(' ');
+      card.classList.add('readmode');
+      card.innerHTML = `<p class="rd-label">Read it to him, out loud</p>
+        <p class="rd-text"><span class="said"></span><span class="rest">${text}</span></p>`;
+      scrollToEnd();
+      return text;
+    },
+  };
+}
+
+/* the docked mic. opts: tip, escape, hint, fillCard (readmode card to fill) */
+let waveT = null, tickT = null;
+function micTurn({ tip = 'Tap to speak', escape = false, hint = false, fillText = null, fillCard = null } = {}){
+  return new Promise(resolve => {
+    const area = $('micArea'), orb = $('micOrb'), w = $('micWave');
+    w.innerHTML = '';
+    for (let i = 0; i < 20; i++) w.appendChild(document.createElement('span'));
+    area.classList.remove('gone');
+    orb.classList.remove('live');
+    $('micTip').textContent = tip;
+    $('micTip').classList.remove('hidden');
+    $('micTimer').classList.remove('on');
+    $('micEscape').classList.toggle('gone', !escape);
+    $('micHint').classList.toggle('gone', !hint);
+
+    const close = how => {
+      clearInterval(waveT); clearInterval(tickT);
+      orb.onclick = null;
+      area.classList.add('gone');
+      $('micHint').classList.add('gone');
+      resolve(how);
+    };
+    $('micEscape').onclick = () => close('escape');
+    $('micHint').onclick = () => close('hint');
+
+    const onTap = () => {
+      if (orb.classList.contains('live')) return;
+      orb.classList.add('live');
+      $('micTip').classList.add('hidden');
+      $('micEscape').classList.add('gone');
+      $('micHint').classList.add('gone');
+      $('micTimer').classList.add('on');
+      const bars = [...w.children];
+      waveT = setInterval(() => bars.forEach(b => b.style.height = (16 + Math.random() * 66) + '%'), 100);
+      const t0 = Date.now();
+      tickT = setInterval(() => $('micTimer').textContent = ((Date.now() - t0) / 1000).toFixed(1) + 's', 100);
+      let fill = null;
+      if (fillText && fillCard){
+        const said = fillCard.querySelector('.said'), rest = fillCard.querySelector('.rest');
+        const words = fillText.split(' ');
+        let i = 0;
+        fill = setInterval(() => {
+          if (i >= words.length){ clearInterval(fill); return; }
+          i++;
+          said.textContent = words.slice(0, i).join(' ') + ' ';
+          rest.textContent = words.slice(i).join(' ');
+        }, 300);
+      }
+      $('micOk').onclick = e => { e.stopPropagation(); clearInterval(fill); close('spoke'); };
+      $('micX').onclick = e => {
+        e.stopPropagation();
+        clearInterval(waveT); clearInterval(tickT); clearInterval(fill);
+        orb.classList.remove('live');
+        $('micTimer').classList.remove('on');
+        $('micTip').classList.remove('hidden');
+        if (escape) $('micEscape').classList.remove('gone');
+        if (hint) $('micHint').classList.remove('gone');
+        if (fillText && fillCard){
+          fillCard.querySelector('.said').textContent = '';
+          fillCard.querySelector('.rest').textContent = fillText;
+        }
+        orb.onclick = onTap;
+      };
+    };
+    orb.onclick = onTap;
+  });
+}
+
+async function learnSequence(mo){
+  await sarah('Here’s how. Four steps.');
+  const sc = makeScaffold(mo);
+  for (let i = 0; i < mo.frame.length; i++){ sc.reveal(); await wait(1500); }
+  await sarah('That’s the whole answer. Now say it to him. Just read it, nobody hears this but you.');
+  const text = sc.toRead();
+  await micTurn({ tip:'Tap, then read it out', fillText:text, fillCard:sc.card });
+  return { path:'read' };
+}
+
+async function chatMoment(mo, mode){
+  $('storyScreen').classList.add('is-hidden');
+  $('chatScreen').classList.remove('is-hidden');
+  chatStream.innerHTML = '';
+  setProgress(100, 'Your turn');
+  await judgeSays(mo);
+
+  if (mode === 'learn'){
+    const r = await learnSequence(mo);
+    return { ...r, hintUsed:false };
+  }
+
+  /* try it yourself */
+  await sarah('Answer him the way you would in the room. Nobody hears this but you.');
+  let hintUsed = false, sc = null, allOut = false;
+  while (true){
+    const how = await micTurn({ tip:'Tap to speak', escape:true, hint:!allOut });
+
+    if (how === 'hint'){
+      hintUsed = true;
+      if (!sc) sc = makeScaffold(mo);
+      allOut = sc.reveal();
+      if (!allOut) continue;              /* pill again, next segment next tap */
+      /* all four steps are out: Sarah offers the read */
+      await sarah('That’s the whole answer. Want to just read it to him?');
+      const pick = await options([
+        { v:'read', label:'Read it to him' },
+        { v:'own',  label:'I’ll say it my own way' },
+      ]);
+      if (pick === 'read'){
+        const text = sc.toRead();
+        await micTurn({ tip:'Tap, then read it out', fillText:text, fillCard:sc.card });
+        return { path:'read', hintUsed:true };
+      }
+      continue;                            /* back to the mic, no pill left */
+    }
+
+    if (how === 'spoke') return { path:'speak', hintUsed };
+
+    if (how === 'escape'){
+      await sarah('No problem at all. Let’s learn it first.');
+      const r = await learnSequence(mo);
+      return { ...r, hintUsed };
+    }
+  }
 }
 
 flow();
