@@ -1,0 +1,302 @@
+/* ============================================================
+   Stimuler · India Onboarding — DESIGN TOKENS (single source of truth)
+
+   Three candidate directions for the revamp, switched via
+   <html data-theme="lavender | gold | indigo">.
+   styleguide.html renders every component from these tokens;
+   index.html consumes the same file, so the locked direction
+   restyles the whole flow by changing one attribute.
+
+   Rule carried over from onboarding-form v2 (indigo direction):
+   gold is PROGRESS/REWARD only — never interactive.
+   ============================================================ */
+
+/* ---------- shared, theme-independent ---------- */
+:root{
+  /* feedback — same meaning in every direction */
+  --succ-100:#E0FBEE; --succ-200:#BFF6DC; --succ-250:#7EFFB8;
+  --succ-300:#32E18D; --succ-400:#2DCB7F; --succ-700:#1E8755; --succ-800:#16653F;
+  --warn-300:#F5B252; --warn-600:#B8863E;
+
+  /* read-aloud card (→ green on success) — speaking-test specific */
+  --read-bg:#30281B;      --read-border:#82644F;
+  --read-label:#C0B39F;   --read-said:#CF975E;  --read-rest:rgba(252,231,201,.35);
+  --read-chip-bg:#643B1B; --read-chip-border:#9C7247;
+  --read-icon:#FCE7C9;
+
+  /* recording */
+  --rec:#E56F53;
+
+  /* neutrals on glass */
+  --glass-08:rgba(255,255,255,.08);
+  --glass-12:rgba(255,255,255,.12);
+
+  /* radii */
+  --r-bubble:20px; --r-card:16px; --r-opt:16px; --r-pill:999px;
+
+  /* brand indigo ramp (locked color set) */
+  --blue-50:#F0EFFF; --blue-100:#D1CFFF; --blue-200:#BBB7FF;
+  --blue-300:#9D96FF; --blue-400:#8982FF; --blue-500:#6C63FF;
+  --blue-600:#625AE8; --blue-700:#4D46B5; --blue-800:#3B368C; --blue-900:#2D2A6B;
+
+  /* defaults that themes may override */
+  --bubble-fs:17.5px;                         /* bubble text size          */
+  --bubble-lh:28px;
+  --bubble-border:color-mix(in srgb, var(--bubble-brd-b) 50%, transparent);
+  --shimmer:var(--blue-300);                  /* voice-state border sweep  */
+  --track:rgba(255,255,255,.12);              /* progress track            */
+  --progress-grad-a:var(--progress);          /* progress fill gradient    */
+  --progress-grad-b:var(--progress);
+  --skip-fg:var(--text-mid);
+  --read-done-bg:rgba(191,246,220,.1);        /* read-aloud success card   */
+  --read-done-border:rgba(50,225,141,.16);
+  --read-done-label:var(--succ-200);
+  --read-done-text:var(--succ-300);
+  --mic-orb-1:#B09CFF; --mic-orb-2:#8B71FF;   /* conversation-flow mic orb */
+  --mic-orb-3:#6A4FF0; --mic-orb-4:#4A2EE0;
+}
+
+/* ============================================================
+   DIRECTION 1 · "Refined lavender"  (default — evolved Figma V3)
+   Interactive violet gets its own voice; lavenders are text-only.
+   ============================================================ */
+:root, [data-theme="lavender"]{
+  --bg:#0C0811;
+  --bg-raise:#271D33;
+
+  --text-hi:#FFFFFF;
+  --text-mid:#F1E9FD;
+  --text-low:#A992C6;
+  --text-faint:#7F6E95;
+
+  --accent:#8B49E2;            /* interactive: selection, focus, links   */
+  --highlight:#D3B7F8;         /* celebratory text, graph "Advance"      */
+  --progress:#D3B7F8;
+  --progress-label:#D3B7F8;
+
+  --bubble-fill:rgba(53,46,62,.32);
+  --bubble-brd-a:#352E3E;
+  --bubble-brd-b:#8C7AA4;
+
+  --chip-bg:#31263E;
+  --chip-border:#8B49E2;
+  --chip-fg:#F1E9FD;
+
+  --opt-bg:var(--glass-08);
+  --opt-fg:#F1E9FD;
+
+  --cta-bg:#F1E9FD;            /* primary "ready" button                 */
+  --cta-fg:#2A1F3D;
+  --cta-disabled-bg:#473A58;
+  --cta-disabled-fg:rgba(241,233,253,.45);
+
+  --skip-bg:#473A58;
+  --skip-border:#7F6E95;
+
+  --field-bg:var(--glass-08);
+  --field-border:rgba(255,255,255,.14);
+  --field-focus:#7F6E95;
+
+  --mic-idle:#5F4BE8;
+  --mic-fg:#FFFFFF;
+
+  --tag-bg:#4E4062;            /* "Your Current Level" ladder tag        */
+  --graph-accent:#C6A9F1;
+  --graph-accent-soft:#B79BE8;
+  --graph-area:#8B49E2;
+
+  --glow-1:rgba(139,73,226,.20);
+  --glow-2:rgba(83,58,120,.16);
+}
+
+/* ============================================================
+   ★ LOCKED · "App" — sampled from the shipped app screens
+   Indigo owns interaction; gold owns progress (segmented bar,
+   unchanged from the app); success moments go deep green.
+   ============================================================ */
+[data-theme="app"]{
+  --bg:#0D0B14;
+  --bg-raise:#0A0810;
+
+  --text-hi:#FFFFFF;
+  --text-mid:#E9E6F2;
+  --text-low:#A9A4BC;
+  --text-faint:#6E6884;
+
+  /* interactive = ONE color: blue-500. The ramp supplies borders
+     (400/300) and deep fills (800 tag) but every tappable fill is 500. */
+  --accent:var(--blue-500);
+  --highlight:#D9A24A;
+  --progress:#D9A24A;          /* gold — progress only, as in the app    */
+  --progress-label:#D9A24A;
+  --progress-grad-a:#E7B455;
+  --progress-grad-b:#C68F35;
+  --track:#26242E;
+
+  --bubble-fill:#191723;       /* near-bg solid fill, defined by border  */
+  --bubble-border:color-mix(in srgb, var(--blue-400) 38%, transparent);
+  --shimmer:var(--blue-300);
+  --r-bubble:24px;
+  --bubble-fs:17px;
+  --bubble-lh:26px;
+
+  --chip-bg:var(--blue-500);
+  --chip-border:var(--blue-300);
+  --chip-fg:#FFFFFF;
+
+  --opt-bg:#211F2E;
+  --opt-fg:#EDEBF5;
+
+  --cta-bg:#FFFFFF;
+  --cta-fg:#0B0A12;
+  --cta-disabled-bg:#211F2E;
+  --cta-disabled-fg:rgba(233,230,242,.4);
+
+  --skip-bg:var(--blue-500);   /* active skip is bright indigo…          */
+  --skip-border:var(--blue-400);
+  --skip-fg:#FFFFFF;           /* …dimmed state comes from .dimmed       */
+
+  --field-bg:#211F2C;
+  --field-border:rgba(255,255,255,.06);
+  --field-focus:var(--blue-500);
+
+  --mic-idle:var(--blue-500);
+  --mic-fg:#FFFFFF;
+  --mic-orb-1:var(--blue-200);
+  --mic-orb-2:var(--blue-400);
+  --mic-orb-3:var(--blue-500);
+  --mic-orb-4:var(--blue-700);
+
+  /* read-aloud card: neutral glass + indigo inner glow, like the
+     practice passage card — spoken words fill in periwinkle */
+  --read-bg:rgba(255,255,255,.045);
+  --read-border:rgba(255,255,255,.10);
+  --read-glow:inset 0 0 60px color-mix(in srgb, var(--accent) 13%, transparent), inset 0 1px 0 rgba(255,255,255,.06);
+  --read-label:var(--text-low);
+  --read-said:var(--blue-300);
+  --read-rest:rgba(255,255,255,.38);
+  --read-chip-bg:rgba(255,255,255,.06);
+  --read-chip-border:rgba(255,255,255,.14);
+  --read-icon:var(--blue-200);
+
+  --read-done-bg:#0B150F;
+  --read-done-border:#2E7D52;
+  --read-done-label:#4CAF7D;
+  --read-done-text:#63E39B;
+
+  --tag-bg:var(--blue-800);
+  --graph-accent:#E7B455;
+  --graph-accent-soft:#D9A24A;
+  --graph-area:#D9A24A;
+
+  --glow-1:rgba(108,99,255,.15);
+  --glow-2:rgba(59,54,140,.12);
+}
+
+/* ============================================================
+   DIRECTION 2 · "Stimuler dark + gold"
+   The house style of the other Stimuler prototypes: warm
+   near-black, bright gold carries both interaction and reward.
+   ============================================================ */
+[data-theme="gold"]{
+  --bg:#0B0A07;
+  --bg-raise:#2C2413;
+
+  --text-hi:#FFFFFF;
+  --text-mid:#F4ECD9;
+  --text-low:#B4A987;
+  --text-faint:#847B62;
+
+  --accent:#F6C445;
+  --highlight:#FFD34D;
+  --progress:#F6C445;
+  --progress-label:#F6C445;
+
+  --bubble-fill:rgba(62,54,38,.30);
+  --bubble-brd-a:#3E3626;
+  --bubble-brd-b:#A99356;
+
+  --chip-bg:#3A2F16;
+  --chip-border:#F6C445;
+  --chip-fg:#FFF3D6;
+
+  --opt-bg:var(--glass-08);
+  --opt-fg:#F4ECD9;
+
+  --cta-bg:#F6C445;
+  --cta-fg:#241A05;
+  --cta-disabled-bg:#3E361F;
+  --cta-disabled-fg:rgba(244,236,217,.45);
+
+  --skip-bg:#4A3E1D;
+  --skip-border:#907843;
+
+  --field-bg:var(--glass-08);
+  --field-border:rgba(255,255,255,.14);
+  --field-focus:#907843;
+
+  --mic-idle:#F6C445;
+  --mic-fg:#241A05;
+
+  --tag-bg:#574722;
+  --graph-accent:#F2CB6B;
+  --graph-accent-soft:#E9BE52;
+  --graph-area:#F6C445;
+
+  --glow-1:rgba(246,196,69,.13);
+  --glow-2:rgba(130,96,28,.12);
+}
+
+/* ============================================================
+   DIRECTION 3 · "Indigo + gold split"
+   onboarding-form v2 logic extended to chat: indigo owns every
+   interaction, gold appears ONLY on progress and reward moments.
+   ============================================================ */
+[data-theme="indigo"]{
+  --bg:#0A0C13;
+  --bg-raise:#1D2236;
+
+  --text-hi:#FFFFFF;
+  --text-mid:#E9ECFA;
+  --text-low:#98A0C4;
+  --text-faint:#666E92;
+
+  --accent:#6D7CFF;
+  --highlight:#F2B93B;         /* reward highlight stays gold            */
+  --progress:#F2B93B;          /* gold = progress/reward only            */
+  --progress-label:#F2B93B;
+
+  --bubble-fill:rgba(46,52,78,.32);
+  --bubble-brd-a:#2E344E;
+  --bubble-brd-b:#7E8BC0;
+
+  --chip-bg:#232848;
+  --chip-border:#6D7CFF;
+  --chip-fg:#E9ECFA;
+
+  --opt-bg:var(--glass-08);
+  --opt-fg:#E9ECFA;
+
+  --cta-bg:#E4E8FF;
+  --cta-fg:#1B2040;
+  --cta-disabled-bg:#2B3050;
+  --cta-disabled-fg:rgba(233,236,250,.45);
+
+  --skip-bg:#2A3052;
+  --skip-border:#4A5384;
+
+  --field-bg:var(--glass-08);
+  --field-border:rgba(255,255,255,.14);
+  --field-focus:#4A5384;
+
+  --mic-idle:#5865F2;
+  --mic-fg:#FFFFFF;
+
+  --tag-bg:#333B63;
+  --graph-accent:#F2CB6B;      /* growth curve = reward = gold           */
+  --graph-accent-soft:#E9BE52;
+  --graph-area:#F2B93B;
+
+  --glow-1:rgba(109,124,255,.15);
+  --glow-2:rgba(60,70,140,.14);
+}
