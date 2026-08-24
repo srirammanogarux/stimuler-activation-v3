@@ -6,6 +6,18 @@
    ============================================================ */
 'use strict';
 
+/* ---------- the video slot model ----------
+   Beat 1 (pressure) is SCENARIO-OWNED and optional: a scenario gets it
+   only when bespoke footage exists in /videos and is listed here.
+   Beats 2 (dread) and 3 (walk) are COHORT-SHARED, always present.
+   To upgrade a scenario: drop videos/<scenario>_pressure.mp4 and add
+   one line below. Nothing else changes.                              */
+const PRESSURE_CLIPS = {
+  manager: 'videos/deadline.mp4',   /* shot for the leave story: it IS this scenario */
+  /* meetings: 'videos/meetings_pressure.mp4',   ← when generated */
+  /* present:  'videos/present_pressure.mp4',    ← when generated */
+};
+
 /* per-scenario captions — the ONLY thing that changes between rooms */
 const STORY = {
   manager: {
@@ -53,13 +65,21 @@ window.playStory = function(roomId){
     $('stThem').textContent      = st.them;
     $('stTag').textContent       = st.tag;
 
-    const beats = [
-      { el:$('stB1'), dur:3600, video:$('stV1'), cap:st.beats.pressure, eye:$('stE1'), txt:$('stT1') },
-      { el:$('stB2'), dur:3400, video:$('stV2'), cap:st.beats.dread,    eye:$('stE2'), txt:$('stT2') },
-      { el:$('stB3'), dur:3000, video:$('stV3'), cap:st.beats.walk,     eye:$('stE3'), txt:$('stT3') },
+    const beats = [];
+    if (PRESSURE_CLIPS[roomId]){
+      $('stV1').src = PRESSURE_CLIPS[roomId];
+      beats.push({ el:$('stB1'), dur:3600, video:$('stV1'), cap:st.beats.pressure, eye:$('stE1'), txt:$('stT1') });
+    }
+    beats.push(
+      { el:$('stB2'), dur:3400, video:$('stV2'), cap:st.beats.dread, eye:$('stE2'), txt:$('stT2') },
+      { el:$('stB3'), dur:3000, video:$('stV3'), cap:st.beats.walk,  eye:$('stE3'), txt:$('stT3') },
       { el:$('stB4'), dur:3600 },
-    ];
-    const dots = [...document.querySelectorAll('.st-dots i')];
+    );
+    /* dots match however many beats this scenario has */
+    const dotBox = document.querySelector('.st-dots');
+    dotBox.innerHTML = beats.map(() => '<i></i>').join('');
+    const dots = [...dotBox.children];
+    $('stB1').classList.remove('on');
 
     /* show the screen */
     ['chatScreen','storyScreen'].forEach(s =>
