@@ -520,6 +520,7 @@ function enterActHint(){
   U('ahEye').textContent='How to answer';
   U('ahTitle').textContent='A simple 4-part answer.';
   ahIdx=0;ahPhase='explain';clearInterval(ahReadT);
+  U('ahFill').parentElement.classList.remove('done');
   U('ahNext').hidden=false;
   U('ahMicRow').hidden=true;
   U('ahTip').style.opacity='';
@@ -548,7 +549,7 @@ function ahEnterRead(){
   const cx=U('ahCtx'), ttl=U('ahTitle');
   ttl.hidden=false;
   U('ahEye').textContent='Try reading this';
-  cx.textContent=practiceCtx(); cx.hidden=ahFromBulb||!practiceCtx();
+  cx.hidden=true;
   ttl.textContent='“'+practiceQ()+'”';
   card.innerHTML='<p class="ah-para" id="ahPara">'+readingParts().join(' ').split(' ').map(w=>`<span class="w">${w}</span>`).join(' ')+'</p>';
   card.classList.remove('showes');
@@ -562,6 +563,7 @@ function ahFinishRead(){
   clearInterval(ahReadT);clearInterval(ahWaveT);
   document.querySelectorAll('#ahPara .w').forEach(w=>w.classList.add('g'));
   U('ahFill').style.width='100%';
+  U('ahFill').parentElement.classList.add('done');
   U('acthint').classList.add('done');
   U('ahPill').hidden=true;
   U('ahPause').hidden=true;

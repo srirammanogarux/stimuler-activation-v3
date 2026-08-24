@@ -421,3 +421,15 @@ html, #usaFlow{height:100%;}#usaFlow{color:var(--text-hi);-webkit-font-smoothing
   --gold-glow:rgba(217,162,74,.32);
   background:var(--bg);
 }
+
+/* ---- review fixes: bigger teach/read type, no ctx line, green finish ---- */
+#usaFlow #acthint .fq{font-size:25px !important;line-height:1.25}
+#usaFlow #acthint .eyebrow{font-size:12.5px}
+#usaFlow .scaf-card .seg{padding:13px 0}
+#usaFlow .scaf-card .seg .st{font-size:11px;margin-bottom:5px}
+#usaFlow .scaf-card .seg p{font-size:17px;line-height:1.5}
+#usaFlow .scaf-card.readmode{padding:26px 22px}
+#usaFlow .scaf-card.readmode .ah-para{font-size:19.5px;line-height:1.9}
+#usaFlow .ah-ctx{display:none !important}
+#usaFlow .scaf-progress{height:7px}
+#usaFlow .scaf-progress.done i{background:linear-gradient(90deg,#2E7D52,#43D6A0)}
