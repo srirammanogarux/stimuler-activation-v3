@@ -1,30 +1,25 @@
 /* ============================================================
-   Activation v3 · step 5 — the score, India report anatomy.
-   Score % + purple bar → (impromptu only: the 4-step report) →
-   the passage with the two weak words highlighted → one
-   pron-card at a time, India-style: word, phonetics, play chip,
-   score, mic button, green done state. Bar climbs per word.
-   Then: value line → journey → paywall.
+   Activation v3 — results, ported from the USA flow shape,
+   worn in the current palette.
+   read path : speech meter (novice → proficient) → pron fixes
+               → "first step done" → plan flow
+   speak path: report card → plan flow
+   plan flow : loader → plan → promise → paywall
    ============================================================ */
 'use strict';
 
-const SCORE = {
+const RESULTS = {
   manager:  { read:74, speak:58,
     drill:[{ w:'Friday',  ph:'/ˈfraɪ.deɪ/', from:54 }, { w:'wedding', ph:'/ˈwed.ɪŋ/', from:51 }],
-    report:  [true, true, false, false],
-    value:   'Five minutes ago this conversation made you nervous. You just handled it.' },
+    report:[true, true, false, false] },
   meetings: { read:72, speak:55,
     drill:[{ w:'option',  ph:'/ˈɒp.ʃən/', from:53 }, { w:'earlier', ph:'/ˈɜː.li.ər/', from:50 }],
-    report:  [true, true, false, false],
-    value:   'You just did the thing you never do in meetings. You said it first.' },
+    report:[true, true, false, false] },
   present:  { read:75, speak:56,
     drill:[{ w:'losing', ph:'/ˈluː.zɪŋ/', from:55 }, { w:'statuses', ph:'/ˈsteɪ.təs.ɪz/', from:52 }],
-    report:  [true, true, false, false],
-    value:   'That’s the first time your work got the words it deserves.' },
+    report:[true, true, false, false] },
 };
-const WORD_LIFT = 6;   /* the top score climbs this much per fixed word */
 
-/* the plan screen, USA anatomy: title, trajectory, checks, scenarios */
 const PLAN = {
   manager: {
     title: 'Eight weeks to <em>ask without rehearsing</em>',
@@ -46,153 +41,142 @@ const PLAN = {
   },
 };
 
-window.playScore = function({ room, path, hintUsed, frame, name }){
+const LADDER = [
+  ['Proficient', 'C2'], ['Advanced', 'C1'], ['Upper intermediate', 'B2'],
+  ['Intermediate', 'B1'], ['Beginner', 'A2'], ['Novice', 'A1'],
+];
+
+window.playResults = function({ room, path, frame, name }){
   return new Promise(resolve => {
-    const $ = id => document.getElementById(id);
-    const sc = SCORE[room] || SCORE.manager;
-    const pronounceLead = (path === 'read') || hintUsed;
-    const base = path === 'read' ? sc.read : sc.speak;
-    let score = 0;
+    const $  = id => document.getElementById(id);
+    const rs = RESULTS[room] || RESULTS.manager;
+    const show = id => ['chatScreen','storyScreen','learnScreen','momentScreen',
+      'reportScreen','meterScreen','pronScreen','loaderScreen','planScreen','promiseScreen','payScreen']
+      .forEach(s => { const e = $(s); if (e) e.classList.toggle('is-hidden', s !== id); });
 
-    const setScore = (to, ms = 900) => {
-      const from = score; score = to;
-      const t0 = performance.now();
-      const step = t => {
-        const k = Math.min(1, (t - t0) / ms);
-        const v = Math.round(from + (to - from) * (1 - Math.pow(1 - k, 3)));
-        $('scNum').textContent = v;
-        $('scBarFill').style.width = v + '%';
-        if (k < 1) requestAnimationFrame(step);
-      };
-      requestAnimationFrame(step);
-    };
-
-    /* ---- header + report ---- */
-    $('scNum').textContent = '0';
-    $('scBarFill').style.width = '0%';
-    $('scBar').classList.remove('win');
-    if (pronounceLead){
-      $('scOpen').textContent = path === 'read'
-        ? 'You said the whole thing out loud. Two words held you back:'
-        : 'Good. The structure was there. Two words held you back:';
-      $('scReport').innerHTML = '';
-      $('scReport').style.display = 'none';
-    } else {
-      $('scOpen').textContent = 'A real attempt. Here’s what landed, and what didn’t.';
-      $('scReport').style.display = '';
-      $('scReport').innerHTML = frame.map((f, i) => `
-        <li class="${sc.report[i] ? 'hit' : ''}">
-          <span class="scb-mark">${sc.report[i] ? '✓' : '✗'}</span>
+    /* ---------- speak: the report card ---------- */
+    function report(){
+      const score = rs.speak;
+      $('rpNum').textContent = '0';
+      $('rpList').innerHTML = frame.map((f, i) => `
+        <li class="${rs.report[i] ? 'hit' : ''}">
+          <span class="scb-mark">${rs.report[i] ? '✓' : '✗'}</span>
           <span class="scb-text">${f.s}</span></li>`).join('');
+      show('reportScreen');
+      count($('rpNum'), score, 900);
+      $('rpCta').onclick = () => planFlow(score);
     }
 
-    /* ---- the passage, weak words highlighted ---- */
-    const answer = frame.map(f => f.t).join(' ');
-    const weak = sc.drill.map(d => d.w.toLowerCase());
-    $('scPassageText').innerHTML = answer.split(' ').map(word => {
-      const clean = word.replace(/[^\w’']/g, '').toLowerCase();
-      return weak.includes(clean)
-        ? `<span class="hlw idle" data-w="${clean}">${word}</span>`
-        : word;
-    }).join(' ');
-    $('scState').textContent = 'Let’s fix them, one at a time.';
+    /* ---------- read: the speech meter ---------- */
+    function meter(){
+      const score = rs.read;
+      $('mtRail').innerHTML = '<span class="trophy">🏆</span>' +
+        LADDER.map(() => '<b></b><i></i>').join('').slice(0, -7);
+      $('mtLabels').innerHTML = LADDER.map(([n, c]) =>
+        `<p class="${n === 'Advanced' ? 'tgt' : ''}">${n}<small>${c}</small></p>`).join('');
+      show('meterScreen');
+      const badge = $('mtBadge');
+      badge.textContent = score + '%';
+      badge.style.top = '78%';
+      /* the badge is where they ARE, one rung under the target */
+      setTimeout(() => { badge.style.top = Math.min(80, Math.max(24, (100 - score) * 1.65)) + '%'; }, 500);
+      $('mtCta').onclick = () => pron(score);
+    }
 
-    $('scValue').textContent = sc.value;
-    $('scValue').classList.add('is-off');
-    $('scCta').classList.add('is-off');
-    $('scDrillZone').innerHTML = '';
-
-    /* ---- show + count the base score ---- */
-    ['chatScreen','storyScreen','learnScreen','scoreScreen'].forEach(s =>
-      $(s).classList.toggle('is-hidden', s !== 'scoreScreen'));
-    setTimeout(() => setScore(base), 400);
-
-    /* ---- the drill: one India pron-card at a time ---- */
-    let wi = 0;
-    function pronCard(){
-      const d = sc.drill[wi];
-      $('scDrillZone').innerHTML = `
-        <div class="pron-card" id="pcCard">
-          <div class="pc-top">
-            <div>
-              <p class="pc-word">${d.w}</p>
-              <p class="pc-ph">${d.ph}</p>
+    /* ---------- read: pronunciation fixes ---------- */
+    function pron(score){
+      show('pronScreen');
+      $('pnValue').classList.add('is-off');
+      $('pnCta').classList.add('is-off');
+      let wi = 0;
+      const card = () => {
+        const d = rs.drill[wi];
+        $('pnZone').innerHTML = `
+          <div class="pron-card" id="pnCard">
+            <div class="pc-top">
+              <div><p class="pc-word">${d.w}</p><p class="pc-ph">${d.ph}</p></div>
+              <button class="pc-play"><img src="assets/sarah-avatar.png" alt="">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></button>
             </div>
-            <button class="pc-play" id="pcPlay">
-              <img src="assets/sarah-avatar.png" alt="">
-              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-            </button>
-          </div>
-          <div class="pc-bottom">
-            <div class="pc-score"><b id="pcScore">${d.from}</b><span>pronunciation</span></div>
-            <div class="pc-right">
-              <button class="pc-btn" id="pcBtn">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/><line x1="12" y1="18" x2="12" y2="22"/></svg>
-                Say the word
-              </button>
-              <p class="pc-tip">Say it <b>slowly</b> first</p>
+            <div class="pc-bottom">
+              <div class="pc-score"><b id="pnScore">${d.from}</b><span>pronunciation</span></div>
+              <div class="pc-right">
+                <button class="pc-btn" id="pnBtn">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/><line x1="12" y1="18" x2="12" y2="22"/></svg>
+                  Say the word
+                </button>
+                <p class="pc-tip">Say it <b>slowly</b> first</p>
+              </div>
             </div>
-          </div>
-          <div class="pc-burst"></div>
-        </div>`;
-      $('pcPlay').addEventListener('click', () => {
-        $('pcPlay').style.opacity = .55;
-        setTimeout(() => $('pcPlay').style.opacity = '', 900);
-      });
-      $('pcBtn').addEventListener('click', function(){
-        const btn = $('pcBtn');
-        if (btn.classList.contains('listening') || btn.classList.contains('done')) return;
-        btn.classList.add('listening');
-        btn.innerHTML = 'Listening…';
-        setTimeout(() => {
-          const card = $('pcCard');
-          btn.classList.remove('listening'); btn.classList.add('done');
-          btn.innerHTML = '✓ Heard it clearly';
-          card.classList.add('done');
-          card.insertAdjacentHTML('beforeend',
-            '<div class="pc-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="5 12 10 17 19 7"/></svg></div>');
-          /* the word's score climbs, the passage word goes green, the top bar lifts */
-          const b = $('pcScore'); let v = parseInt(b.textContent, 10);
-          const iv = setInterval(() => { b.textContent = ++v; if (v >= 84) clearInterval(iv); }, 26);
-          const hl = document.querySelector(`.hlw[data-w="${sc.drill[wi].w.toLowerCase()}"]`);
-          if (hl){ hl.classList.remove('idle'); hl.classList.add('ok'); }
-          setScore(base + WORD_LIFT * (wi + 1), 700);
-          $('scState').textContent = wi === 0 ? 'One down. One to go.' : 'Both words fixed.';
-          $('scState').classList.add('ok');
+            <div class="pc-burst"></div>
+          </div>`;
+        $('pnBtn').onclick = () => {
+          const btn = $('pnBtn');
+          if (btn.classList.contains('listening') || btn.classList.contains('done')) return;
+          btn.classList.add('listening'); btn.innerHTML = 'Listening…';
           setTimeout(() => {
-            $('scState').classList.remove('ok');
-            if (++wi < sc.drill.length){ pronCard(); }
-            else {
-              $('scBar').classList.add('win');
-              $('scDrillZone').innerHTML = '';
-              $('scState').textContent = '';
-              $('scValue').classList.remove('is-off');
-              $('scCta').classList.remove('is-off');
-            }
-          }, 1200);
-        }, 1400);
-      });
+            btn.classList.remove('listening'); btn.classList.add('done');
+            btn.innerHTML = '✓ Heard it clearly';
+            $('pnCard').classList.add('done');
+            $('pnCard').insertAdjacentHTML('beforeend',
+              '<div class="pc-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="5 12 10 17 19 7"/></svg></div>');
+            let v = parseInt($('pnScore').textContent, 10);
+            const iv = setInterval(() => { $('pnScore').textContent = ++v; if (v >= 84) clearInterval(iv); }, 26);
+            setTimeout(() => {
+              if (++wi < rs.drill.length){ card(); }
+              else {
+                $('pnValue').classList.remove('is-off');
+                $('pnCta').classList.remove('is-off');
+              }
+            }, 1300);
+          }, 1400);
+        };
+      };
+      card();
+      $('pnCta').onclick = () => planFlow(score);
     }
-    setTimeout(pronCard, 1400);
 
-    /* ---- the plan → paywall ---- */
-    $('scCta').addEventListener('click', () => {
+    /* ---------- shared: loader → plan → promise → paywall ---------- */
+    function planFlow(score){
+      const items = ['Reading your speech', 'Picking your scenarios', 'Shaping week one'];
+      $('ldList').innerHTML = items.map(t => `<li><i>✓</i>${t}</li>`).join('');
+      show('loaderScreen');
+      [...$('ldList').children].forEach((li, i) =>
+        setTimeout(() => li.classList.add('on'), 600 + i * 750));
+      setTimeout(() => plan(score), 600 + items.length * 750 + 500);
+    }
+
+    function plan(score){
       const pl = PLAN[room] || PLAN.manager;
       $('plEyebrow').textContent = name ? `Your plan, ${name}` : 'Your plan';
       $('plTitle').innerHTML = pl.title;
       $('plSub').textContent = 'Built from what you showed today.';
       $('plFrom').textContent = `Today · ${score}%`;
       $('plChecks').innerHTML = pl.checks.map(c => `<li>${c}</li>`).join('');
+      $('plDone').textContent = '';
       $('plDone').insertAdjacentText('beforeend', pl.done);
       $('plNext').textContent = pl.next;
-      ['scoreScreen','planScreen'].forEach(s =>
-        $(s).classList.toggle('is-hidden', s !== 'planScreen'));
-    }, { once:true });
+      show('planScreen');
+      $('plCta').onclick = () => promise();
+    }
 
-    $('plCta').addEventListener('click', () => {
-      ['planScreen','payScreen'].forEach(s =>
-        $(s).classList.toggle('is-hidden', s !== 'payScreen'));
-      resolve();
-    }, { once:true });
+    function promise(){
+      $('prTitle').textContent = name ? `One small promise, ${name}.` : 'One small promise.';
+      show('promiseScreen');
+      $('prCta').onclick = () => { show('payScreen'); resolve(); };
+    }
+
+    function count(elm, to, ms){
+      const t0 = performance.now();
+      const step = t => {
+        const k = Math.min(1, (t - t0) / ms);
+        elm.textContent = Math.round(to * (1 - Math.pow(1 - k, 3)));
+        if (k < 1) requestAnimationFrame(step);
+      };
+      requestAnimationFrame(step);
+    }
+
+    if (path === 'read') meter();
+    else report();
   });
 };

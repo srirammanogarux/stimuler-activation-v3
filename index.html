@@ -62,7 +62,7 @@
 
     <!-- ============ STORY · 5 beats ============ -->
     <section class="screen story-screen is-hidden" id="storyScreen">
-      <div class="st-dots"><i></i><i></i><i></i><i></i><i></i></div>
+      <div class="st-dots"><i></i><i></i><i></i><i></i></div>
 
       <div class="st-beat" id="stB1">
         <video class="st-video" id="stV1" src="videos/deadline.mp4" muted playsinline preload="auto" loop></video>
@@ -101,12 +101,31 @@
         <div class="flash"></div>
       </div>
 
-      <div class="st-beat st-mission" id="stB5">
-        <p class="sm-label">Your mission</p>
-        <h2 class="sm-objective" id="smObjective"></h2>
-        <ul class="sm-stars" id="smStars"></ul>
-        <p class="sm-timer" id="smTimer"></p>
-        <button class="sm-cta" id="smCta">Start</button>
+    </section>
+
+    <!-- ============ THE MOMENT · USA practice anatomy ============ -->
+    <section class="screen mm-screen is-hidden" id="momentScreen">
+      <div class="mm-inner">
+        <div class="mm-ask">
+          <img class="mm-av" src="assets/manager.png" alt="">
+          <div class="mm-bub"><p id="mmQ"></p></div>
+        </div>
+        <div class="mm-microw">
+          <p class="mo-tipbub" id="mmTip">Tap to speak</p>
+          <div class="mm-orbrow">
+            <div class="mic-orb" id="mmOrb" role="button" tabindex="0" aria-label="Speak">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/><line x1="12" y1="18" x2="12" y2="22"/></svg>
+              <div class="wave" id="mmWave"></div>
+              <button class="x" id="mmX" aria-label="Cancel">✕</button>
+              <button class="ok" id="mmOk" aria-label="Done">✓</button>
+            </div>
+            <button class="mm-bulb" id="mmBulb" aria-label="Hint">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 1 3.6 10.8c-.5.4-.6 1-.6 1.7v.5H9v-.5c0-.7-.1-1.3-.6-1.7A6 6 0 0 1 12 3Z"/></svg>
+            </button>
+          </div>
+          <p class="mic-timer" id="mmTimer">0.0s</p>
+          <button class="mic-escape" id="mmEscape">I can’t speak right now</button>
+        </div>
       </div>
     </section>
 
@@ -134,19 +153,47 @@
       </div>
     </section>
 
-    <!-- ============ SCORE · India report anatomy ============ -->
-    <section class="screen score-screen is-hidden" id="scoreScreen">
-      <div class="sc-inner">
-        <p class="sc-eyebrow" id="scEyebrow">Your speech score</p>
-        <div class="sc-scorebar"><span class="sc-big" id="scNum">0</span><span class="sc-pct">%</span></div>
-        <div class="scaf-progress" id="scBar"><i id="scBarFill"></i></div>
-        <p class="sc-open" id="scOpen"></p>
-        <ul class="sc-report" id="scReport"></ul>
-        <div class="hs-passage sc-passage" id="scPassage"><p id="scPassageText"></p></div>
-        <p class="hs-state" id="scState"></p>
-        <div id="scDrillZone"></div>
-        <p class="sc-value is-off" id="scValue"></p>
-        <button class="sc-cta is-off" id="scCta">See my plan</button>
+    <!-- ============ REPORT (impromptu) ============ -->
+    <section class="screen rs-screen is-hidden" id="reportScreen">
+      <div class="rs-inner">
+        <p class="sc-eyebrow">Your attempt</p>
+        <p class="rs-num" id="rpNum">0</p>
+        <p class="rs-open" id="rpOpen">Good. The structure was there.</p>
+        <ul class="sc-report" id="rpList"></ul>
+        <button class="sc-cta" id="rpCta">Build my plan</button>
+      </div>
+    </section>
+
+    <!-- ============ SPEECH METER (read path) ============ -->
+    <section class="screen rs-screen is-hidden" id="meterScreen">
+      <div class="rs-inner">
+        <p class="sc-eyebrow">Your speech level</p>
+        <h2 class="mt-title">Let’s take you to<br><em>Advanced</em></h2>
+        <div class="mt-wrap">
+          <div class="mt-rail" id="mtRail"></div>
+          <div class="mt-labels" id="mtLabels"></div>
+          <div class="mt-badge" id="mtBadge">0%</div>
+        </div>
+        <button class="sc-cta" id="mtCta">Continue</button>
+      </div>
+    </section>
+
+    <!-- ============ PRONUNCIATION FIXES (read path) ============ -->
+    <section class="screen rs-screen is-hidden" id="pronScreen">
+      <div class="rs-inner">
+        <p class="sc-eyebrow">Fix your pronunciation</p>
+        <p class="rs-open" id="pnOpen">Two words held you back. Let’s fix them.</p>
+        <div id="pnZone"></div>
+        <p class="sc-value is-off" id="pnValue">That’s your first step in practicing English, done.</p>
+        <button class="sc-cta is-off" id="pnCta">Build my plan</button>
+      </div>
+    </section>
+
+    <!-- ============ LOADER ============ -->
+    <section class="screen rs-screen is-hidden" id="loaderScreen">
+      <div class="rs-inner ld-inner">
+        <p class="sc-eyebrow">Building your plan</p>
+        <ul class="ld-list" id="ldList"></ul>
       </div>
     </section>
 
@@ -183,7 +230,18 @@
           <p class="pl-next" id="plNext"></p>
         </div>
 
-        <button class="sc-cta" id="plCta">See my plan options</button>
+        <button class="sc-cta" id="plCta">Continue</button>
+      </div>
+    </section>
+
+    <!-- ============ PROMISE ============ -->
+    <section class="screen rs-screen is-hidden" id="promiseScreen">
+      <div class="rs-inner pr-inner">
+        <p class="sc-eyebrow">One small promise</p>
+        <h2 class="pr-title" id="prTitle"></h2>
+        <p class="pr-body">Ten minutes a day. That’s all week one asks of you.</p>
+        <div class="pr-card"><span>🎙</span><p>One real scenario, spoken out loud, every day.</p></div>
+        <button class="sc-cta" id="prCta">I’m in</button>
       </div>
     </section>
 

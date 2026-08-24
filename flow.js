@@ -206,11 +206,11 @@ async function flow(){
   </div>`));
   scrollToEnd();
   await wait(1100);
-  await sarah('How do you want to play it?');
+  await sarah('Before you walk in: do you want me to teach you how to handle him, or will you try it yourself?');
   const LEARN = { v:'learn', label:'Teach me how to handle it',
                   desc:'Learn it in 4 steps, then say it.' };
-  const TRY   = { v:'try',   label:'Try it myself',
-                  desc:'Answer your way. Hints if you want them.' };
+  const TRY   = { v:'try',   label:'I’ll try it myself',
+                  desc:'Answer your way. A hint is there if you want it.' };
   A.mode = await options(A.level === 'beginner' ? [LEARN, TRY] : [TRY, LEARN], DBG.mode || (A.level === 'beginner' ? 'learn' : 'try'));
 
   /* the story */
@@ -220,134 +220,95 @@ async function flow(){
   if (past('story')){ /* jumped beyond the story */ }
   else await window.playStory(A.room);
 
-  /* the moment, in chat */
+  /* the moment: the USA practice screen */
   reach('moment');
   let result;
   if (past('moment')){
-    result = { path: A.mode === 'learn' ? 'read' : 'speak', hintUsed:false };
-    $('storyScreen').classList.add('is-hidden');
-    $('chatScreen').classList.remove('is-hidden');
+    result = { path: A.mode === 'learn' ? 'read' : 'speak' };
   } else {
-    result = await chatMoment(mo, A.mode);
+    result = await momentScreen(mo, A.mode);
   }
   A.path = result.path;
 
-  /* the score → plan → paywall */
+  /* results → loader → plan → promise → paywall */
   reach('score');
-  await window.playScore({
-    room: A.room, path: A.path, hintUsed: result.hintUsed,
-    frame: mo.frame, name: A.name,
+  await window.playResults({
+    room: A.room, path: A.path, frame: mo.frame, name: A.name,
+  });
+}
+
+/* ============================================================
+   THE MOMENT — question up top, mic + hint bulb below.
+   learn mode goes straight to the teach screens.
+   ============================================================ */
+function momentScreen(mo, mode){
+  return new Promise(async resolve => {
+    if (mode === 'learn'){
+      await learnScreens(mo);
+      resolve({ path:'read' }); return;
+    }
+    $('mmQ').textContent = mo.q;
+    ['chatScreen','storyScreen'].forEach(id => $(id).classList.add('is-hidden'));
+    $('momentScreen').classList.remove('is-hidden');
+
+    const orb = $('mmOrb'), w = $('mmWave');
+    w.innerHTML = '';
+    for (let i = 0; i < 20; i++) w.appendChild(document.createElement('span'));
+    orb.classList.remove('live');
+    $('mmTip').textContent = 'Tap to speak';
+    $('mmTip').classList.remove('hidden');
+    $('mmTimer').classList.remove('on');
+    $('mmBulb').classList.remove('gone');
+    $('mmEscape').classList.remove('gone');
+    let wt = null, tt = null;
+
+    const leave = async path => {
+      clearInterval(wt); clearInterval(tt);
+      orb.onclick = null;
+      $('momentScreen').classList.add('is-hidden');
+      resolve({ path });
+    };
+
+    /* hint or escape: the teach screens take over, then the read */
+    const toLearn = async ({ skipTeach = false } = {}) => {
+      clearInterval(wt); clearInterval(tt);
+      orb.onclick = null;
+      $('momentScreen').classList.add('is-hidden');
+      await learnScreens(mo, { skipTeach });
+      resolve({ path:'read' });
+    };
+    $('mmBulb').onclick = () => toLearn();
+    $('mmEscape').onclick = () => toLearn();
+
+    orb.onclick = () => {
+      if (orb.classList.contains('live')) return;
+      orb.classList.add('live');
+      $('mmTip').classList.add('hidden');
+      $('mmBulb').classList.add('gone');
+      $('mmEscape').classList.add('gone');
+      $('mmTimer').classList.add('on');
+      const bars = [...w.children];
+      wt = setInterval(() => bars.forEach(b => b.style.height = (16 + Math.random() * 66) + '%'), 100);
+      const t0 = Date.now();
+      tt = setInterval(() => $('mmTimer').textContent = ((Date.now() - t0) / 1000).toFixed(1) + 's', 100);
+      $('mmOk').onclick = e => { e.stopPropagation(); leave('speak'); };
+      $('mmX').onclick = e => {
+        e.stopPropagation();
+        clearInterval(wt); clearInterval(tt);
+        orb.classList.remove('live');
+        $('mmTimer').classList.remove('on');
+        $('mmTip').classList.remove('hidden');
+        $('mmBulb').classList.remove('gone');
+        $('mmEscape').classList.remove('gone');
+      };
+    };
   });
 }
 
 /* ============================================================
    THE MOMENT, IN CHAT
    ============================================================ */
-async function judgeSays(mo){
-  dimLast();
-  const row = el(`<div class="msg judge"><div class="dp"><img src="assets/manager.png" alt=""></div>
-    <div class="bubble"><p class="judge-name">${mo.role}</p>
-    <p class="judge-ctx">${mo.ctx}</p><p><b>${mo.q}</b></p></div></div>`);
-  chatStream.appendChild(row); scrollToEnd();
-  await wait(1700);
-}
 
-function makeScaffold(mo){
-  const card = el(`<div class="scaf-card">` + mo.frame.map(f =>
-    `<div class="seg" hidden><span class="st">${f.s}</span><p>${f.t}</p></div>`).join('') +
-    `<div class="scaf-prog"><i></i></div></div>`);
-  chatStream.appendChild(card); scrollToEnd();
-  let n = 0;
-  return {
-    card,
-    reveal(){
-      const segs = [...card.querySelectorAll('.seg')];
-      if (n >= segs.length) return true;
-      segs.forEach(sg => sg.classList.remove('cur'));
-      segs[n].hidden = false;
-      segs[n].classList.add('cur');
-      card.querySelector('.scaf-prog i').style.width = (++n / segs.length * 100) + '%';
-      scrollToEnd();
-      return n >= segs.length;
-    },
-    toRead(){
-      const text = mo.frame.map(f => f.t).join(' ');
-      card.classList.add('readmode');
-      card.innerHTML = `<p class="rd-label">Read it to him, out loud</p>
-        <p class="rd-text"><span class="said"></span><span class="rest">${text}</span></p>`;
-      scrollToEnd();
-      return text;
-    },
-  };
-}
-
-/* the docked mic. opts: tip, escape, hint, fillCard (readmode card to fill) */
-let waveT = null, tickT = null;
-function micTurn({ tip = 'Tap to speak', escape = false, hint = false, fillText = null, fillCard = null } = {}){
-  return new Promise(resolve => {
-    const area = $('micArea'), orb = $('micOrb'), w = $('micWave');
-    w.innerHTML = '';
-    for (let i = 0; i < 20; i++) w.appendChild(document.createElement('span'));
-    area.classList.remove('gone');
-    orb.classList.remove('live');
-    $('micTip').textContent = tip;
-    $('micTip').classList.remove('hidden');
-    $('micTimer').classList.remove('on');
-    $('micEscape').classList.toggle('gone', !escape);
-    $('micHint').classList.toggle('gone', !hint);
-
-    const close = how => {
-      clearInterval(waveT); clearInterval(tickT);
-      orb.onclick = null;
-      area.classList.add('gone');
-      $('micHint').classList.add('gone');
-      resolve(how);
-    };
-    $('micEscape').onclick = () => close('escape');
-    $('micHint').onclick = () => close('hint');
-
-    const onTap = () => {
-      if (orb.classList.contains('live')) return;
-      orb.classList.add('live');
-      $('micTip').classList.add('hidden');
-      $('micEscape').classList.add('gone');
-      $('micHint').classList.add('gone');
-      $('micTimer').classList.add('on');
-      const bars = [...w.children];
-      waveT = setInterval(() => bars.forEach(b => b.style.height = (16 + Math.random() * 66) + '%'), 100);
-      const t0 = Date.now();
-      tickT = setInterval(() => $('micTimer').textContent = ((Date.now() - t0) / 1000).toFixed(1) + 's', 100);
-      let fill = null;
-      if (fillText && fillCard){
-        const said = fillCard.querySelector('.said'), rest = fillCard.querySelector('.rest');
-        const words = fillText.split(' ');
-        let i = 0;
-        fill = setInterval(() => {
-          if (i >= words.length){ clearInterval(fill); return; }
-          i++;
-          said.textContent = words.slice(0, i).join(' ') + ' ';
-          rest.textContent = words.slice(i).join(' ');
-        }, 300);
-      }
-      $('micOk').onclick = e => { e.stopPropagation(); clearInterval(fill); close('spoke'); };
-      $('micX').onclick = e => {
-        e.stopPropagation();
-        clearInterval(waveT); clearInterval(tickT); clearInterval(fill);
-        orb.classList.remove('live');
-        $('micTimer').classList.remove('on');
-        $('micTip').classList.remove('hidden');
-        if (escape) $('micEscape').classList.remove('gone');
-        if (hint) $('micHint').classList.remove('gone');
-        if (fillText && fillCard){
-          fillCard.querySelector('.said').textContent = '';
-          fillCard.querySelector('.rest').textContent = fillText;
-        }
-        orb.onclick = onTap;
-      };
-    };
-    orb.onclick = onTap;
-  });
-}
 
 /* the learn screens: teach (4 steps, Next through them), then read.
    skipTeach jumps straight to the read phase (hints already taught). */
@@ -369,7 +330,7 @@ function learnScreens(mo, { skipTeach = false } = {}){
       card.innerHTML = segs.map((f, k) =>
         `<div class="seg ${k === i ? 'cur' : ''} ${k > i ? 'dim' : ''}">
            <span class="st">${f.s}</span><p>${f.t}</p></div>`).join('');
-      $('lsCta').textContent = i < segs.length - 1 ? 'Next' : 'Got it';
+      $('lsCta').textContent = 'Continue';
       $('lsCta').classList.remove('is-hidden');
       $('lsMicRow').classList.add('is-hidden');
     }
@@ -442,71 +403,7 @@ function learnScreens(mo, { skipTeach = false } = {}){
   });
 }
 
-/* the conversation closes: their answer lands, the manager replies */
-async function playback(mo, saidText){
-  userChip(saidText);
-  await wait(700);
-  dimLast();
-  const row = el(`<div class="msg judge"><div class="dp"><img src="assets/manager.png" alt=""></div>
-    <div class="bubble"><p class="judge-name">${mo.role}</p><p>${mo.reply}</p></div></div>`);
-  chatStream.appendChild(row); scrollToEnd();
-  await wait(1900);
-  await sarah(`And that’s the conversation, ${A.name}. You handled it. Let’s see how you sounded.`);
-  await wait(300);
-}
 
-async function chatMoment(mo, mode){
-  $('storyScreen').classList.add('is-hidden');
-  $('chatScreen').classList.remove('is-hidden');
-  chatStream.innerHTML = '';
-  setProgress(100, 'Your turn');
-  await judgeSays(mo);
-
-  if (mode === 'learn'){
-    await sarah('Let me teach you how to handle it. Four small steps.');
-    await learnScreens(mo);
-    await playback(mo, mo.frame.map(f => f.t).join(' '));
-    return { path:'read', hintUsed:false };
-  }
-
-  /* try it yourself */
-  await sarah('Answer him the way you would in the room. Nobody hears this but you.');
-  let hintUsed = false, sc = null, allOut = false;
-  while (true){
-    const how = await micTurn({ tip:'Tap to speak', escape:true, hint:!allOut });
-
-    if (how === 'hint'){
-      hintUsed = true;
-      if (!sc) sc = makeScaffold(mo);
-      allOut = sc.reveal();
-      if (!allOut) continue;              /* pill again, next segment next tap */
-      /* all four steps are out: Sarah offers the read */
-      await sarah('That’s the whole answer. Want to just read it to him?');
-      const pick = await options([
-        { v:'read', label:'Read it to him' },
-        { v:'own',  label:'I’ll say it my own way' },
-      ]);
-      if (pick === 'read'){
-        await learnScreens(mo, { skipTeach:true });
-        await playback(mo, mo.frame.map(f => f.t).join(' '));
-        return { path:'read', hintUsed:true };
-      }
-      continue;                            /* back to the mic, no pill left */
-    }
-
-    if (how === 'spoke'){
-      await playback(mo, mo.spokenT);
-      return { path:'speak', hintUsed };
-    }
-
-    if (how === 'escape'){
-      await sarah('No problem at all. Let me teach you how to handle it first.');
-      await learnScreens(mo);
-      await playback(mo, mo.frame.map(f => f.t).join(' '));
-      return { path:'read', hintUsed };
-    }
-  }
-}
 
 /* ---------- review panel ---------- */
 (function panel(){

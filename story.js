@@ -52,17 +52,12 @@ window.playStory = function(roomId){
     /* fill the slots */
     $('stThem').textContent      = st.them;
     $('stTag').textContent       = st.tag;
-    $('smObjective').innerHTML   = st.objective;
-    $('smStars').innerHTML       = (window.momentFrame ? window.momentFrame(roomId) : [])
-      .map(f => `<li><span class="star">★</span>${f.s}</li>`).join('');
-    $('smTimer').textContent     = st.timer;
 
     const beats = [
       { el:$('stB1'), dur:3600, video:$('stV1'), cap:st.beats.pressure, eye:$('stE1'), txt:$('stT1') },
       { el:$('stB2'), dur:3400, video:$('stV2'), cap:st.beats.dread,    eye:$('stE2'), txt:$('stT2') },
       { el:$('stB3'), dur:3000, video:$('stV3'), cap:st.beats.walk,     eye:$('stE3'), txt:$('stT3') },
-      { el:$('stB4'), dur:3800 },
-      { el:$('stB5'), dur:0    },
+      { el:$('stB4'), dur:3600 },
     ];
     const dots = [...document.querySelectorAll('.st-dots i')];
 
@@ -83,8 +78,13 @@ window.playStory = function(roomId){
       }, 34);
     }
 
+    function finish(){
+      clearTimeout(autoT); clearInterval(typeT);
+      screen.removeEventListener('click', onTap);
+      resolve();
+    }
     function show(n){
-      if (n >= beats.length) n = beats.length - 1;
+      if (n >= beats.length){ finish(); return; }
       i = n;
       clearTimeout(autoT);
       beats.forEach((b, k) => b.el.classList.toggle('on', k === n));
@@ -93,13 +93,9 @@ window.playStory = function(roomId){
         if (k < n) d.classList.add('done');
       });
       const b = beats[n];
-      if (b.dur){
-        dots[n].style.setProperty('--st-dur', b.dur + 'ms');
-        requestAnimationFrame(() => requestAnimationFrame(() => dots[n].classList.add('run')));
-        autoT = setTimeout(() => show(n + 1), b.dur);
-      } else {
-        dots[n].classList.add('done');
-      }
+      dots[n].style.setProperty('--st-dur', b.dur + 'ms');
+      requestAnimationFrame(() => requestAnimationFrame(() => dots[n].classList.add('run')));
+      autoT = setTimeout(() => show(n + 1), b.dur);
       if (b.video){ try{ b.video.currentTime = 0; b.video.play(); }catch(e){} }
       if (b.cap){
         b.eye.textContent = b.cap.eyebrow;
@@ -108,17 +104,9 @@ window.playStory = function(roomId){
       if (n === 3) requestAnimationFrame(() => requestAnimationFrame(() => $('stB4').classList.add('go')));
     }
 
-    /* tap hurries; the mission card only responds to Start */
-    const onTap = e => {
-      if (e.target.id === 'smCta') return;
-      if (i < beats.length - 1) show(i + 1);
-    };
+    /* tap hurries; the last beat runs out into the moment */
+    const onTap = () => show(i + 1);
     screen.addEventListener('click', onTap);
-    $('smCta').addEventListener('click', () => {
-      clearTimeout(autoT); clearInterval(typeT);
-      screen.removeEventListener('click', onTap);
-      resolve();
-    }, { once:true });
 
     show(0);
   });

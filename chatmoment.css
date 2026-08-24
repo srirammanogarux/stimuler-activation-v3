@@ -146,3 +146,105 @@
 .ls-cta:active{transform:scale(.98)}
 .ls-cta.is-hidden{display:none}
 .ls-microw + .ls-cta{margin-top:14px}
+
+/* ============================================================
+   THE MOMENT — USA practice anatomy, current palette
+   ============================================================ */
+.mm-screen{
+  background:
+    radial-gradient(120% 60% at 50% 0%,color-mix(in srgb,var(--accent) 12%,transparent) 0%,transparent 60%),
+    var(--bg);
+}
+.mm-inner{flex:1;display:flex;flex-direction:column;padding:110px 26px 44px}
+.mm-ask{display:flex;gap:12px;align-items:flex-start}
+.mm-av{width:46px;height:46px;border-radius:50%;object-fit:cover;flex:none;
+  border:2px solid color-mix(in srgb,var(--progress) 55%,transparent)}
+.mm-bub{
+  background:rgba(255,255,255,.08);border:1px solid color-mix(in srgb,var(--progress) 34%,transparent);
+  border-radius:20px;border-top-left-radius:6px;padding:16px 18px;
+  box-shadow:inset 0 0 40px color-mix(in srgb,var(--progress) 6%,transparent);
+}
+.mm-bub p{font-family:var(--font-display);font-weight:600;font-size:18px;line-height:1.5;color:var(--text-hi)}
+.mm-microw{margin-top:auto;display:flex;flex-direction:column;align-items:center}
+.mm-orbrow{position:relative;display:flex;align-items:center;justify-content:center}
+.mm-bulb{
+  position:absolute;left:calc(50% + 62px);width:52px;height:52px;border-radius:50%;
+  cursor:pointer;background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.14);color:var(--blue-300);
+  display:grid;place-items:center;
+}
+.mm-bulb svg{width:24px;height:24px}
+.mm-bulb.gone{display:none}
+
+/* ============================================================
+   RESULTS — report · meter · pron fixes · loader · promise
+   ============================================================ */
+.rs-screen{background:var(--bg);align-items:center;overflow-y:auto}
+.rs-inner{width:100%;max-width:352px;padding:84px 24px 56px;
+  display:flex;flex-direction:column;align-items:center;text-align:center;
+  font-family:var(--font-display)}
+.rs-num{font-size:58px;font-weight:800;letter-spacing:-.02em;color:var(--text-hi);
+  font-variant-numeric:tabular-nums;margin-bottom:8px}
+.rs-num::after{content:'%';font-size:24px;font-weight:700;color:var(--text-low);margin-left:2px}
+.rs-open{font-size:16px;font-weight:600;line-height:1.5;color:var(--text-mid);
+  max-width:30ch;margin-bottom:22px}
+.rs-inner .sc-report{margin-bottom:26px}
+.rs-inner .sc-cta{margin-top:auto}
+
+/* the meter */
+.mt-title{font-size:27px;font-weight:700;line-height:1.25;letter-spacing:-.01em;
+  color:var(--text-hi);margin-bottom:26px}
+.mt-title em{font-style:normal;color:var(--progress)}
+.mt-wrap{position:relative;display:grid;grid-template-columns:44px 1fr;gap:18px;
+  align-items:stretch;width:100%;max-width:290px;margin:0 auto 30px;text-align:left}
+.mt-rail{
+  position:relative;border-radius:999px;min-height:380px;
+  background:color-mix(in srgb,var(--progress) 9%,transparent);
+  border:1.5px solid color-mix(in srgb,var(--progress) 30%,transparent);
+  display:flex;flex-direction:column;justify-content:space-between;
+  padding:16px 0;align-items:center;
+}
+.mt-rail i{width:12px;height:2.5px;border-radius:2px;
+  background:color-mix(in srgb,var(--progress) 35%,transparent)}
+.mt-rail b{width:9px;height:9px;border-radius:50%;
+  background:color-mix(in srgb,var(--progress) 60%,transparent)}
+.mt-rail .trophy{font-size:15px;line-height:1}
+.mt-labels{display:flex;flex-direction:column;justify-content:space-between;padding:10px 0}
+.mt-labels p{font-size:15px;font-weight:600;color:var(--text-low)}
+.mt-labels p small{font-size:11px;font-weight:700;color:var(--text-faint);margin-left:5px}
+.mt-labels p.tgt{color:var(--progress)}
+.mt-labels p.tgt small{color:color-mix(in srgb,var(--progress) 70%,transparent)}
+.mt-badge{
+  position:absolute;left:-14px;top:60%;transform:translateY(-50%);
+  background:var(--progress);color:#221703;font-weight:800;font-size:13px;
+  border-radius:999px;padding:5px 11px;
+  transition:top 1.4s cubic-bezier(.22,.9,.3,1);
+}
+.mt-badge::after{content:'';position:absolute;left:100%;top:50%;
+  transform:translateY(-50%);border:6px solid transparent;border-left-color:var(--progress)}
+
+/* pron zone reuses .pron-card from the India stylesheet */
+#pnZone{width:100%;text-align:left;margin-bottom:20px}
+
+/* loader */
+.ld-inner{justify-content:center}
+.ld-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:16px;
+  text-align:left;width:100%;max-width:280px}
+.ld-list li{display:flex;align-items:center;gap:12px;font-size:15px;font-weight:500;
+  color:var(--text-faint);transition:color .4s}
+.ld-list li i{width:22px;height:22px;border-radius:50%;flex:none;display:grid;place-items:center;
+  font-style:normal;font-size:11px;font-weight:800;
+  border:2px solid rgba(255,255,255,.14);color:transparent;transition:all .4s}
+.ld-list li.on{color:var(--text-mid)}
+.ld-list li.on i{border-color:transparent;background:color-mix(in srgb,#4CAF7D 25%,transparent);color:#63E39B}
+
+/* promise */
+.pr-inner{justify-content:center}
+.pr-title{font-size:26px;font-weight:700;line-height:1.3;color:var(--text-hi);margin-bottom:12px}
+.pr-body{font-size:15px;line-height:1.6;color:var(--text-low);max-width:28ch;margin-bottom:24px}
+.pr-card{display:flex;align-items:center;gap:12px;text-align:left;
+  border-radius:18px;padding:16px 18px;margin-bottom:30px;width:100%;
+  background:color-mix(in srgb,var(--accent) 10%,transparent);
+  border:1px solid color-mix(in srgb,var(--accent) 30%,transparent)}
+.pr-card span{font-size:20px}
+.pr-card p{font-size:14.5px;line-height:1.5;color:var(--text-mid)}
