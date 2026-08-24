@@ -20,7 +20,7 @@ const A = { lang:null, name:null, goal:null, situation:null, room:null, level:nu
 /* ---------- review-panel state: chips write the URL, the URL drives ---------- */
 const Q = new URLSearchParams(location.search);
 const DBG = { room:Q.get('room'), lvl:Q.get('lvl'), mode:Q.get('mode'), step:Q.get('step') };
-const STEPS = ['story','moment','score'];
+const STEPS = ['intro','language','name','goal','situation','rooms','level','choice','story','moment','score'];
 const hasParams = !!(DBG.room || DBG.lvl || DBG.mode || DBG.step);
 const target = DBG.step && STEPS.includes(DBG.step) ? DBG.step : (hasParams ? 'story' : null);
 let FF = !!target;
@@ -105,6 +105,7 @@ function setProgress(pct, label){
    THE FUNNEL
    ============================================================ */
 async function flow(){
+  reach('intro');
   setProgress(0, 'Let’s get started');
   await wait(500);
 
@@ -112,6 +113,7 @@ async function flow(){
   await sarah('Hey! I’m Sarah. I’m here to help you speak English with confidence, in the moments that actually matter to you.');
 
   /* 1 · native language */
+  reach('language');
   setProgress(10, '10% completed');
   await sarah('First, what’s your native language?');
   A.lang = await options([
@@ -124,11 +126,13 @@ async function flow(){
   ], 'es');
 
   /* 2 · name */
+  reach('name');
   setProgress(22, '22% completed');
   await sarah('And what should I call you?');
   A.name = await nameInput();
 
   /* 3 · goal */
+  reach('goal');
   setProgress(36, 'Your goal');
   await sarah(`Good to meet you, ${A.name}. What are you learning English for?`);
   A.goal = await options([
@@ -140,6 +144,7 @@ async function flow(){
   ], 'career');
 
   /* 4 · situation */
+  reach('situation');
   setProgress(50, '50% completed');
   await sarah('And what’s your situation right now?');
   A.situation = await options([
@@ -161,6 +166,7 @@ async function flow(){
   }
 
   /* 5 · scenario */
+  reach('rooms');
   setProgress(66, 'Almost there');
   await sarah('Work, then. Which of these do you want to handle with ease first?');
   const ROOM_OPTS = [
@@ -177,6 +183,7 @@ async function flow(){
   }
 
   /* 6 · level */
+  reach('level');
   setProgress(84, '84% completed');
   await sarah('How would you describe your English right now?');
   A.level = await options([
@@ -187,6 +194,7 @@ async function flow(){
 
   /* meet the character, and choose how to play it */
   const mo = window.momentData(A.room);
+  reach('choice');
   setProgress(92, 'Almost ready');
   await sarah(`Perfect, ${A.name}.`);
   await sarah('Now we practise it live. As a first step, I want you to handle the very first situation you said you wanted to win.');
@@ -506,7 +514,10 @@ async function chatMoment(mo, mode){
     ['dpRoom','room',[['manager','Manager'],['meetings','Meetings'],['present','Presenting']]],
     ['dpLvl','lvl',[['beginner','Beginner'],['intermediate','Intermediate'],['advanced','Advanced']]],
     ['dpMode','mode',[['learn','Teach me'],['try','Try myself']]],
-    ['dpStep','step',[['story','Story'],['moment','Moment'],['score','Score']]],
+    ['dpStep','step',[
+      ['language','Lang'],['name','Name'],['goal','Goal'],['situation','Situation'],
+      ['rooms','Rooms'],['level','Level'],['choice','Choice'],
+      ['story','Story'],['moment','Moment'],['score','Score']]],
   ];
   groups.forEach(([boxId, key, items]) => {
     const box = $(boxId);
