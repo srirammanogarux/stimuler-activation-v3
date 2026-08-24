@@ -137,10 +137,15 @@ async function flow(){
     { v:'clear',   label:'Be understood the first time' },
   ]);
 
+  /* the story */
+  setProgress(100, 'Your first scenario');
+  await sarah(`Perfect, ${A.name}. Let’s make it real —`);
+  await window.playStory(A.room, A.win);
+
   /* end of this build step */
-  setProgress(100, 'Ready');
-  await sarah(`Perfect, ${A.name}. That’s everything I need.`);
-  await sarah('<b>[ Next build step: the story and your first scenario — not built yet. ]</b>');
+  document.getElementById('storyScreen').classList.add('is-hidden');
+  document.getElementById('chatScreen').classList.remove('is-hidden');
+  await sarah('<b>[ Next build step: the moment — the judge’s line and the mic. Not built yet. ]</b>');
 }
 
 flow();
