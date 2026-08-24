@@ -8,7 +8,7 @@
 
 const $  = id => document.getElementById(id);
 const el = h => { const d = document.createElement('div'); d.innerHTML = h.trim(); return d.firstElementChild; };
-const wait = ms => new Promise(r => setTimeout(r, ms));
+const wait = ms => new Promise(r => setTimeout(r, FF ? 0 : ms));
 
 const SARAH = 'assets/sarah-avatar.png';
 const chatStream = $('chatStream');
@@ -16,6 +16,16 @@ const chatScroll = $('chatScroll');
 
 /* the answers */
 const A = { lang:null, name:null, goal:null, situation:null, room:null, level:null, mode:null, path:null };
+
+/* ---------- review-panel state: chips write the URL, the URL drives ---------- */
+const Q = new URLSearchParams(location.search);
+const DBG = { room:Q.get('room'), lvl:Q.get('lvl'), mode:Q.get('mode'), step:Q.get('step') };
+const STEPS = ['story','moment','score'];
+const hasParams = !!(DBG.room || DBG.lvl || DBG.mode || DBG.step);
+const target = DBG.step && STEPS.includes(DBG.step) ? DBG.step : (hasParams ? 'story' : null);
+let FF = !!target;
+const reach = name => { if (FF && STEPS.indexOf(name) >= STEPS.indexOf(target)) FF = false; };
+const past  = name => !!target && STEPS.indexOf(target) > STEPS.indexOf(name);
 
 /* ---------- primitives (unchanged from the approved shell) ---------- */
 function scrollToEnd(){
@@ -27,6 +37,10 @@ function dimLast(){
 }
 async function sarah(text, typingMs = 680){
   dimLast();
+  if (FF){
+    chatStream.appendChild(el(`<div class="msg dim"><div class="dp"><img src="${SARAH}" alt="Sarah"></div><div class="bubble"><p>${text}</p></div></div>`));
+    scrollToEnd(); return;
+  }
   const row = el(`<div class="msg"><div class="dp"><img src="${SARAH}" alt="Sarah"></div>
                   <div class="bubble typing"><i></i><i></i><i></i></div></div>`);
   chatStream.appendChild(row); scrollToEnd();
@@ -42,7 +56,12 @@ function userChip(label){
   chatStream.appendChild(el(`<div class="chip-row"><div class="chip">${label}</div></div>`));
   scrollToEnd();
 }
-function options(items){
+function options(items, forced = null){
+  if (FF){
+    const it = items.find(x => (x.v ?? x.label) === forced) || items[0];
+    userChip(it.label);
+    return Promise.resolve(it.v ?? it.label);
+  }
   return new Promise(resolve => {
     const wrap = el(`<div class="options"><p class="opt-head">Select an option</p><div class="opt-list"></div></div>`);
     const list = wrap.querySelector('.opt-list');
@@ -60,6 +79,7 @@ function options(items){
   });
 }
 function nameInput(){
+  if (FF){ userChip('Ana'); return Promise.resolve('Ana'); }
   return new Promise(resolve => {
     const wrap = el(`<div class="input-block">
       <div class="phone-field-wrap"><input type="text" placeholder="Your name" maxlength="24" aria-label="Your name"></div>
@@ -101,7 +121,7 @@ async function flow(){
     { v:'hi', label:'Hindi' },
     { v:'fr', label:'French' },
     { v:'ar', label:'Arabic' },
-  ]);
+  ], 'es');
 
   /* 2 · name */
   setProgress(22, '22% completed');
@@ -117,7 +137,7 @@ async function flow(){
     { v:'personal', label:'Personal growth' },
     { v:'school',   label:'Excel at my school' },
     { v:'travel',   label:'Travel confidently' },
-  ]);
+  ], 'career');
 
   /* 4 · situation */
   setProgress(50, '50% completed');
@@ -130,7 +150,7 @@ async function flow(){
     { v:'home',       label:'At home with family' },
     { v:'break',      label:'On a career break' },
     { v:'jobseek',    label:'Looking for work' },
-  ]);
+  ], 'office');
 
   /* only career + working-a-job is built end to end */
   if (!(A.goal === 'career' && A.situation === 'office')){
@@ -150,10 +170,10 @@ async function flow(){
     { v:'client',   label:'Handling client calls',      built:false },
     { v:'smalltalk',label:'Small talk with colleagues', built:false },
   ];
-  A.room = await options(ROOM_OPTS);
+  A.room = await options(ROOM_OPTS, DBG.room || 'manager');
   while (!ROOM_OPTS.find(r => r.v === A.room).built){
     await sarah('That one’s coming soon. Pick another for now.');
-    A.room = await options(ROOM_OPTS);
+    A.room = await options(ROOM_OPTS, DBG.room || 'manager');
   }
 
   /* 6 · level */
@@ -163,7 +183,7 @@ async function flow(){
     { v:'beginner',     label:'Beginner',     desc:'I know some words, but I can’t make sentences.' },
     { v:'intermediate', label:'Intermediate', desc:'I can make short sentences about simple things.' },
     { v:'advanced',     label:'Advanced',     desc:'I can hold a short conversation and understand others.' },
-  ]);
+  ], DBG.lvl || 'beginner');
 
   /* meet the character, and choose how to play it */
   const mo = window.momentData(A.room);
@@ -183,18 +203,29 @@ async function flow(){
                   desc:'Learn it in 4 steps, then say it.' };
   const TRY   = { v:'try',   label:'Try it myself',
                   desc:'Answer your way. Hints if you want them.' };
-  A.mode = await options(A.level === 'beginner' ? [LEARN, TRY] : [TRY, LEARN]);
+  A.mode = await options(A.level === 'beginner' ? [LEARN, TRY] : [TRY, LEARN], DBG.mode || (A.level === 'beginner' ? 'learn' : 'try'));
 
   /* the story */
   setProgress(100, 'Your first scenario');
   await sarah('Here’s the situation you’re walking into.');
-  await window.playStory(A.room);
+  reach('story');
+  if (past('story')){ /* jumped beyond the story */ }
+  else await window.playStory(A.room);
 
   /* the moment, in chat */
-  const result = await chatMoment(mo, A.mode);
+  reach('moment');
+  let result;
+  if (past('moment')){
+    result = { path: A.mode === 'learn' ? 'read' : 'speak', hintUsed:false };
+    $('storyScreen').classList.add('is-hidden');
+    $('chatScreen').classList.remove('is-hidden');
+  } else {
+    result = await chatMoment(mo, A.mode);
+  }
   A.path = result.path;
 
   /* the score → plan → paywall */
+  reach('score');
   await window.playScore({
     room: A.room, path: A.path, hintUsed: result.hintUsed,
     frame: mo.frame, name: A.name,
@@ -468,5 +499,29 @@ async function chatMoment(mo, mode){
     }
   }
 }
+
+/* ---------- review panel ---------- */
+(function panel(){
+  const groups = [
+    ['dpRoom','room',[['manager','Manager'],['meetings','Meetings'],['present','Presenting']]],
+    ['dpLvl','lvl',[['beginner','Beginner'],['intermediate','Intermediate'],['advanced','Advanced']]],
+    ['dpMode','mode',[['learn','Teach me'],['try','Try myself']]],
+    ['dpStep','step',[['story','Story'],['moment','Moment'],['score','Score']]],
+  ];
+  groups.forEach(([boxId, key, items]) => {
+    const box = $(boxId);
+    if (!box) return;
+    items.forEach(([v, label]) => {
+      const b = el(`<button class="${DBG[key] === v ? 'active' : ''}">${label}</button>`);
+      b.addEventListener('click', () => {
+        const p = new URLSearchParams(location.search);
+        p.set(key, v);
+        /* picking a flow chip without a step keeps you at the story start */
+        location.search = p.toString();
+      });
+      box.appendChild(b);
+    });
+  });
+})();
 
 flow();
