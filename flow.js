@@ -238,7 +238,8 @@ async function flow(){
 async function managerSays(text){
   dimLast();
   const row = el(`<div class="msg judge"><div class="dp"><img src="assets/manager.png" alt=""></div>
-    <div class="bubble"><p class="judge-name">Miguel · your manager</p><p>${text}</p></div></div>`);
+    <div class="jwrap"><p class="judge-name"><b>Miguel</b> · your manager</p>
+    <div class="bubble"><p>${text}</p></div></div></div>`);
   chatStream.appendChild(row); scrollToEnd();
   if (!FF) await wait(Math.max(1500, text.split(' ').length * 125));
 }

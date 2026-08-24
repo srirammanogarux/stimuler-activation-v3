@@ -3,13 +3,15 @@
    Judge bubble · meet card · USA scaffold card · docked mic.
    ============================================================ */
 
-/* the judge speaks: same anatomy as Sarah, gold voice */
-.msg.judge .dp{border-color:color-mix(in srgb,var(--progress) 55%,transparent)}
-.msg.judge .bubble{border-color:color-mix(in srgb,var(--progress) 40%,transparent);
-  box-shadow:inset 0 0 40px color-mix(in srgb,var(--progress) 7%,transparent)}
-.judge-name{font-family:var(--font-display);font-size:12px;font-weight:600;
-  letter-spacing:.08em;text-transform:uppercase;color:var(--progress);margin-bottom:5px}
-.judge-ctx{font-family:var(--font-display);font-size:13px;color:var(--text-low);margin-bottom:4px}
+/* the judge speaks: identical bubble anatomy to Sarah; identity lives
+   in a small sender line above, and a whisper of gold on the border */
+.msg.judge .dp{border-color:color-mix(in srgb,var(--progress) 45%,transparent)}
+.msg.judge .jwrap{display:flex;flex-direction:column;gap:5px;max-width:78%}
+.msg.judge .bubble{max-width:100%;
+  border-color:color-mix(in srgb,var(--progress) 26%,transparent)}
+.judge-name{font-family:var(--font-display);font-size:12px;font-weight:500;
+  color:var(--text-low);padding-left:6px}
+.judge-name b{color:color-mix(in srgb,var(--progress) 80%,#fff 10%);font-weight:600}
 
 /* the meet card: who you're about to face */
 .meet-card{
