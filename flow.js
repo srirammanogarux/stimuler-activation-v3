@@ -218,20 +218,12 @@ async function flow(){
   if (past('story')){ /* jumped beyond the story */ }
   else await window.playStory(A.room);
 
-  /* the moment through the loader: the USA subsystem, verbatim */
+  /* the moment through the paywall: the USA subsystem, verbatim */
   reach('moment');
-  $('chatScreen').classList.add('is-hidden');
-  await window.enterUSA({ room: A.room, mode: A.mode, name: A.name, level: A.level });
-
-  /* the plan, then the letter, then the paywall */
   reach('score');
-  fillPlan();
-  ['storyScreen','planScreen'].forEach(id =>
-    $(id).classList.toggle('is-hidden', id !== 'planScreen'));
-  await new Promise(r => $('plCta').addEventListener('click', r, { once:true }));
-  $('planScreen').classList.add('is-hidden');
-  await window.usaLetter(A.name);
-  $('payScreen').classList.remove('is-hidden');
+  $('chatScreen').classList.add('is-hidden');
+  $('storyScreen').classList.add('is-hidden');
+  await window.enterUSA({ room: A.room, mode: A.mode, name: A.name, level: A.level });
 }
 
 /* the manager speaks in chat: gold judge bubble with his face */
@@ -244,29 +236,6 @@ async function managerSays(text){
   if (!FF) await wait(Math.max(1500, text.split(' ').length * 125));
 }
 
-/* the plan screen content (kept from the approved USA-anatomy port) */
-function fillPlan(){
-  const PLANS = {
-    manager:  { title:'Eight weeks to <em>ask without rehearsing</em>',
-      checks:['Asking for time off','Deadline conversations','Giving clear updates','Pushing back politely'],
-      done:'Talking to your manager', next:'Speaking up in meetings · Presenting my work' },
-    meetings: { title:'Eight weeks to <em>a voice the room waits for</em>',
-      checks:['Taking a position','Disagreeing without friction','Thinking aloud clearly','Bringing the room with you'],
-      done:'Speaking up in meetings', next:'Talking to my manager · Presenting my work' },
-    present:  { title:'Eight weeks to <em>presenting without freezing</em>',
-      checks:['Opening strong','Explaining the impact','Handling questions','Closing with next steps'],
-      done:'Presenting your work', next:'Talking to my manager · Speaking up in meetings' },
-  };
-  const pl = PLANS[A.room] || PLANS.manager;
-  $('plEyebrow').textContent = A.name ? `Your plan, ${A.name}` : 'Your plan';
-  $('plTitle').innerHTML = pl.title;
-  $('plSub').textContent = 'Built from what you showed today.';
-  $('plFrom').textContent = 'Today';
-  $('plChecks').innerHTML = pl.checks.map(c => `<li>${c}</li>`).join('');
-  $('plDone').textContent = '';
-  $('plDone').insertAdjacentText('beforeend', pl.done);
-  $('plNext').textContent = pl.next;
-}
 
 
 /* ============================================================

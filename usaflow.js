@@ -47,7 +47,7 @@ const USA_SCEN = {
     pron:[USA_WORD.losing, USA_WORD.statuses] },
 };
 let usaScen = USA_SCEN.manager;
-let usaResolve = null, usaLetterResolve = null;
+let usaResolve = null;
 
 const practiceSet   = () => usaScen;
 const practiceQ     = () => usaScen.q;
@@ -94,8 +94,6 @@ const U = id => document.getElementById(id);
 
 /* screen switching inside #usaFlow; 'plan' and 'paywall' exit to the host */
 function go(id){
-  if(id==='plan'){ leaveUSA(); if(usaResolve){ const r=usaResolve; usaResolve=null; r(); } return; }
-  if(id==='paywall'){ leaveUSA(); if(usaLetterResolve){ const r=usaLetterResolve; usaLetterResolve=null; r(); } return; }
   appEl().querySelectorAll(':scope > .screen').forEach(s=>s.classList.toggle('is-active', s.id===id));
   renderUSA(id);
 }
@@ -115,22 +113,7 @@ window.enterUSA = function({ room, mode, name, level }){
     else go('act');
   });
 };
-window.usaLetter = function(name){
-  answers.name = name || answers.name;
-  appEl().classList.remove('is-hidden');
-  return new Promise(res=>{
-    usaLetterResolve = res;
-    holdDone=false;
-    U('letter').classList.remove('sealed','sealing');
-    seal.classList.remove('on','grow','said');
-    U('holdHint').textContent='Press and hold to commit';
-    U('letterHead').textContent=`A note from future ${answers.name}`;
-    U('letterBody').textContent='“The meeting came. I asked, plainly, and got my yes. Ten minutes a day got me here.”';
-    U('letterSign').textContent=`${answers.name}, 12 weeks from now`;
-    U('pledgeLine').textContent=`I, ${answers.name}, will practice ${answers.minutes} minutes a day.`;
-    go('letter');
-  });
-};
+
 function renderUSA(id){
   if(id==='act'){
     const actCtx=U('actCtx');
@@ -157,6 +140,70 @@ function renderUSA(id){
   if(id==='analysing')enterAnalysing();
   if(id==='score')runScore({label:usaScen.label},null,false);
   if(id==='loader')runLoader(answers.name);
+  if(id==='plan')fillPlanUSA();
+  if(id==='letter')fillLetter();
+  if(id==='paywall')fillPaywall();
+}
+
+/* ---------------- plan (v1 anatomy, our content) ---------------- */
+const PLAN_COPY = {
+  manager:  { claim:'asking your manager stops needing a rehearsal',
+    checks:['Ask for time off in one clear breath','Hold deadline conversations without tensing up','Give updates people can follow','Push back politely, and keep the room warm'],
+    sessions:['Asking for a day off','Moving a deadline','Giving your Monday update'] },
+  meetings: { claim:'the room waits for what you think',
+    checks:['Take a position without a wind-up','Give the reason that lands','Name the trade-off before they do','Bring the room with you'],
+    sessions:['Backing option B','Disagreeing with the plan','Thinking aloud in a sync'] },
+  present:  { claim:'your work gets the words it deserves',
+    checks:['Open without freezing','Explain the impact in numbers','Say your part without shrinking','Close with a next step'],
+    sessions:['The three-minute demo','Handling the first question','Closing with the rollout'] },
+};
+function fillPlanUSA(){
+  const pc = PLAN_COPY[Object.keys(USA_SCEN).find(k=>USA_SCEN[k]===usaScen)] || PLAN_COPY.manager;
+  const name = answers.name || 'friend';
+  U('planEyebrow').textContent='Your personal plan is ready';
+  U('planTitle').innerHTML=name+', in <em>3 months</em>, '+pc.claim+'.';
+  U('planSub').hidden=true;
+  U('outHeadB').textContent='By November, here is what changes';
+  U('planTraj').innerHTML=trajHTML('2',curLevelName(),null,goalLevelName());
+  U('outLead').textContent='By then you will be able to';
+  const CH='<i><svg viewBox="0 0 16 16" fill="none"><path d="M3 8.5 6.5 12 13 4.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></i>';
+  U('planChecks').innerHTML=pc.checks.map(t=>`<li>${CH}<span>${t}</span></li>`).join('');
+  U('pjTitle').textContent=usaScen.label;
+  U('pjBody').textContent='Everything above is built out of this. Here are the first three sessions.';
+  U('pjList').innerHTML=pc.sessions.map((t,i)=>`<li><b>${t}</b><em>Day ${i+1} · ${answers.minutes} min</em></li>`).join('');
+  /* the deeper personalization cards need the full funnel; hide them here */
+  ['pbento','pfocus'].forEach(c=>{const el=document.querySelector('#usaFlow .'+c); if(el)el.style.display='none';});
+  const fits=document.querySelector('#usaFlow #planFits'); if(fits)fits.closest('.pcard').style.display='none';
+  U('ppSub').textContent='learners started exactly here';
+  document.querySelector('#plan .plan-cta .btn').onclick=()=>go('letter');
+}
+
+/* ---------------- letter fill ---------------- */
+function fillLetter(){
+  holdDone=false;
+  U('letter').classList.remove('sealed','sealing');
+  seal.classList.remove('on','grow','said');
+  U('holdHint').textContent='Press and hold to commit';
+  U('letterHead').textContent='A note from future '+(answers.name||'you');
+  U('letterBody').textContent='“The meeting came. I asked, plainly, and got my yes. Ten minutes a day got me here.”';
+  U('letterSign').textContent=(answers.name||'You')+', 12 weeks from now';
+  U('pledgeLine').textContent='I, '+(answers.name||'friend')+', will practice '+answers.minutes+' minutes a day.';
+}
+
+/* ---------------- paywall (v1, verbatim shell) ---------------- */
+function fillPaywall(){
+  U('pwTitle').textContent='Unlock '+(answers.name||'your')+'’s plan';
+  const FEATS=[
+    ['🎙','Unlimited speaking scenarios, starting with yours'],
+    ['🗣','Real-time feedback on every sentence'],
+    ['📈','Your level, tracked week by week'],
+    ['🧑‍🏫','Sarah in every session'],
+  ];
+  U('pwFeats').innerHTML=FEATS.map(([ic,t])=>
+    `<div style="display:flex;align-items:center;gap:10px;font-size:14.5px;color:var(--text-mid)"><span>${ic}</span><span>${t}</span></div>`).join('');
+  document.querySelector('#paywall .fcta .btn').onclick=()=>{
+    if(usaResolve){const r=usaResolve;usaResolve=null;r();}
+  };
 }
 
 /* ---------------- confetti (lifted) ---------------- */
@@ -224,7 +271,7 @@ function startListen(){
     });
   },90);
 }
-function stopListen(){clearInterval(recInt);clearInterval(waveInt);recInt=null;go('analysing');}
+function stopListen(){clearInterval(recInt);clearInterval(waveInt);recInt=null;go('score');}
 U('stopBtn').addEventListener('click',stopListen);
 U('recX').addEventListener('click',()=>{clearInterval(recInt);clearInterval(waveInt);recInt=null;go('act');});
 U('pauseLink').addEventListener('click',()=>{
@@ -519,7 +566,7 @@ function ahFinishRead(){
   U('ahPill').hidden=true;
   U('ahPause').hidden=true;
   usaFromRead=true;
-  setTimeout(()=>go('analysing'),1400);
+  setTimeout(()=>go('hintscore'),1400);
 }
 U('ahMic').addEventListener('click',()=>{
   if(ahPhase!=='read')return;
