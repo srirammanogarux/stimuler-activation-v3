@@ -13,6 +13,8 @@ const MOMENT = {
     where: 'between meetings',
     ctx: 'He looks up from his laptop.',
     q: 'Yeah, I heard you want a day off next week. What’s it about?',
+    reply: 'Alright. Friday works. Thanks for sorting the handover first.',
+    spokenT: 'Uh, I want to take leave on Friday. My cousin is getting married. The work is mostly finished.',
     frame: [
       { s:'Make the ask',    h:'Name the exact day, straight away.',
         t:'I’d like to take next Friday off.' },
@@ -30,6 +32,8 @@ const MOMENT = {
     where: 'at the team sync',
     ctx: 'The room goes quiet. He turns to you.',
     q: 'We’re leaning towards option A. Thoughts?',
+    reply: 'Two weeks earlier is a strong point. Alright, let us look at B properly.',
+    spokenT: 'I think maybe option B is also good, because it is faster. But A is okay too.',
     frame: [
       { s:'Take a position',    h:'Say which option, straight away. No wind-up.',
         t:'I’d go with option B.' },
@@ -47,6 +51,8 @@ const MOMENT = {
     where: 'at the demo',
     ctx: 'Your work is on the screen. Everyone waits.',
     q: 'Alright, walk us through it.',
+    reply: 'Clean. Send me the rollout plan after this and we will take it to the team.',
+    spokenT: 'So this is the tracking screen thing. We made it because the old way was slow. That is mostly it.',
     frame: [
       { s:'Say what it is',        h:'One plain sentence. No preamble.',
         t:'This is the new order-tracking screen.' },

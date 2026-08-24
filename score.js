@@ -103,7 +103,7 @@ window.playScore = function({ room, path, hintUsed, frame, name }){
     $('scDrillZone').innerHTML = '';
 
     /* ---- show + count the base score ---- */
-    ['chatScreen','storyScreen','scoreScreen'].forEach(s =>
+    ['chatScreen','storyScreen','learnScreen','scoreScreen'].forEach(s =>
       $(s).classList.toggle('is-hidden', s !== 'scoreScreen'));
     setTimeout(() => setScore(base), 400);
 

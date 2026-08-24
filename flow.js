@@ -168,22 +168,26 @@ async function flow(){
   /* meet the character, and choose how to play it */
   const mo = window.momentData(A.room);
   setProgress(92, 'Almost ready');
-  await sarah(`Perfect, ${A.name}. You’re about to meet someone.`);
+  await sarah(`Perfect, ${A.name}.`);
+  await sarah('Now we practise it live. As a first step, I want you to handle the very first situation you said you wanted to win.');
+  await sarah('You’re about to meet someone.');
+  await wait(400);
   chatStream.appendChild(el(`<div class="meet-card">
     <img src="assets/manager.png" alt="">
-    <div><p class="meet-n">${mo.role.replace('Your','Your ')}</p><p class="meet-r">${mo.eyebrow} · ${mo.where}</p></div>
+    <div><p class="meet-n">${mo.role}</p><p class="meet-r">${mo.eyebrow} · ${mo.where}</p></div>
   </div>`));
   scrollToEnd();
-  await wait(900);
+  await wait(1100);
   await sarah('How do you want to play it?');
-  const LEARN = { v:'learn', label:'Teach me a good answer first',
-                  desc:'Learn it in 4 steps, then say it to him.' };
-  const TRY   = { v:'try',   label:'Let me try it myself',
-                  desc:'Answer your way. Hints are there if you want them.' };
+  const LEARN = { v:'learn', label:'Teach me how to handle it',
+                  desc:'Learn it in 4 steps, then say it.' };
+  const TRY   = { v:'try',   label:'Try it myself',
+                  desc:'Answer your way. Hints if you want them.' };
   A.mode = await options(A.level === 'beginner' ? [LEARN, TRY] : [TRY, LEARN]);
 
   /* the story */
   setProgress(100, 'Your first scenario');
+  await sarah('Here’s the situation you’re walking into.');
   await window.playStory(A.room);
 
   /* the moment, in chat */
@@ -306,14 +310,110 @@ function micTurn({ tip = 'Tap to speak', escape = false, hint = false, fillText 
   });
 }
 
-async function learnSequence(mo){
-  await sarah('Here’s how. Four steps.');
-  const sc = makeScaffold(mo);
-  for (let i = 0; i < mo.frame.length; i++){ sc.reveal(); await wait(1500); }
-  await sarah('That’s the whole answer. Now say it to him. Just read it, nobody hears this but you.');
-  const text = sc.toRead();
-  await micTurn({ tip:'Tap, then read it out', fillText:text, fillCard:sc.card });
-  return { path:'read' };
+/* the learn screens: teach (4 steps, Next through them), then read.
+   skipTeach jumps straight to the read phase (hints already taught). */
+function learnScreens(mo, { skipTeach = false } = {}){
+  return new Promise(resolve => {
+    const card = $('lsCard');
+    const segs = mo.frame;
+    const text = segs.map(f => f.t).join(' ');
+    let i = 0;
+
+    $('chatScreen').classList.add('is-hidden');
+    $('learnScreen').classList.remove('is-hidden');
+
+    function paintTeach(){
+      $('lsEyebrow').textContent = 'How to answer';
+      $('lsTitle').textContent = 'A simple 4-part answer.';
+      $('lsProgFill').style.width = ((i + 1) / segs.length * 50) + '%';
+      card.classList.remove('readmode');
+      card.innerHTML = segs.map((f, k) =>
+        `<div class="seg ${k === i ? 'cur' : ''} ${k > i ? 'dim' : ''}">
+           <span class="st">${f.s}</span><p>${f.t}</p></div>`).join('');
+      $('lsCta').textContent = i < segs.length - 1 ? 'Next' : 'Got it';
+      $('lsCta').classList.remove('is-hidden');
+      $('lsMicRow').classList.add('is-hidden');
+    }
+
+    function paintRead(){
+      $('lsEyebrow').textContent = 'Try reading this';
+      $('lsTitle').textContent = '“' + mo.q + '”';
+      $('lsProgFill').style.width = '65%';
+      card.classList.add('readmode');
+      card.innerHTML = `<p class="rd-text"><span class="said"></span><span class="rest">${text}</span></p>`;
+      $('lsCta').classList.add('is-hidden');
+      $('lsMicRow').classList.remove('is-hidden');
+      armReadMic();
+    }
+
+    function armReadMic(){
+      const orb = $('lsOrb'), w = $('lsWave');
+      w.innerHTML = '';
+      for (let k = 0; k < 20; k++) w.appendChild(document.createElement('span'));
+      orb.classList.remove('live');
+      $('lsTip').classList.remove('hidden');
+      $('lsTimer').classList.remove('on');
+      let wt = null, tt = null, fill = null;
+      orb.onclick = () => {
+        if (orb.classList.contains('live')) return;
+        orb.classList.add('live');
+        $('lsTip').classList.add('hidden');
+        $('lsTimer').classList.add('on');
+        const bars = [...w.children];
+        wt = setInterval(() => bars.forEach(b => b.style.height = (16 + Math.random() * 66) + '%'), 100);
+        const t0 = Date.now();
+        tt = setInterval(() => $('lsTimer').textContent = ((Date.now() - t0) / 1000).toFixed(1) + 's', 100);
+        const said = card.querySelector('.said'), rest = card.querySelector('.rest');
+        const words = text.split(' ');
+        let n = 0;
+        fill = setInterval(() => {
+          if (n >= words.length){ clearInterval(fill); return; }
+          n++;
+          said.textContent = words.slice(0, n).join(' ') + ' ';
+          rest.textContent = words.slice(n).join(' ');
+        }, 300);
+        $('lsOk').onclick = e => {
+          e.stopPropagation();
+          clearInterval(wt); clearInterval(tt); clearInterval(fill);
+          orb.onclick = null;
+          $('learnScreen').classList.add('is-hidden');
+          $('chatScreen').classList.remove('is-hidden');
+          resolve({ path:'read' });
+        };
+        $('lsX').onclick = e => {
+          e.stopPropagation();
+          clearInterval(wt); clearInterval(tt); clearInterval(fill);
+          orb.classList.remove('live');
+          $('lsTimer').classList.remove('on');
+          $('lsTip').classList.remove('hidden');
+          card.querySelector('.said').textContent = '';
+          card.querySelector('.rest').textContent = text;
+          armReadMic();
+        };
+      };
+    }
+
+    if (skipTeach){ paintRead(); return; }
+    paintTeach();
+    $('lsCta').onclick = () => {
+      if (++i < segs.length){ paintTeach(); return; }
+      $('lsCta').onclick = null;
+      paintRead();
+    };
+  });
+}
+
+/* the conversation closes: their answer lands, the manager replies */
+async function playback(mo, saidText){
+  userChip(saidText);
+  await wait(700);
+  dimLast();
+  const row = el(`<div class="msg judge"><div class="dp"><img src="assets/manager.png" alt=""></div>
+    <div class="bubble"><p class="judge-name">${mo.role}</p><p>${mo.reply}</p></div></div>`);
+  chatStream.appendChild(row); scrollToEnd();
+  await wait(1900);
+  await sarah(`And that’s the conversation, ${A.name}. You handled it. Let’s see how you sounded.`);
+  await wait(300);
 }
 
 async function chatMoment(mo, mode){
@@ -324,8 +424,10 @@ async function chatMoment(mo, mode){
   await judgeSays(mo);
 
   if (mode === 'learn'){
-    const r = await learnSequence(mo);
-    return { ...r, hintUsed:false };
+    await sarah('Let me teach you how to handle it. Four small steps.');
+    await learnScreens(mo);
+    await playback(mo, mo.frame.map(f => f.t).join(' '));
+    return { path:'read', hintUsed:false };
   }
 
   /* try it yourself */
@@ -346,19 +448,23 @@ async function chatMoment(mo, mode){
         { v:'own',  label:'I’ll say it my own way' },
       ]);
       if (pick === 'read'){
-        const text = sc.toRead();
-        await micTurn({ tip:'Tap, then read it out', fillText:text, fillCard:sc.card });
+        await learnScreens(mo, { skipTeach:true });
+        await playback(mo, mo.frame.map(f => f.t).join(' '));
         return { path:'read', hintUsed:true };
       }
       continue;                            /* back to the mic, no pill left */
     }
 
-    if (how === 'spoke') return { path:'speak', hintUsed };
+    if (how === 'spoke'){
+      await playback(mo, mo.spokenT);
+      return { path:'speak', hintUsed };
+    }
 
     if (how === 'escape'){
-      await sarah('No problem at all. Let’s learn it first.');
-      const r = await learnSequence(mo);
-      return { ...r, hintUsed };
+      await sarah('No problem at all. Let me teach you how to handle it first.');
+      await learnScreens(mo);
+      await playback(mo, mo.frame.map(f => f.t).join(' '));
+      return { path:'read', hintUsed };
     }
   }
 }
