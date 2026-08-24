@@ -9,6 +9,7 @@
 <link rel="stylesheet" href="styles.css">
 <link rel="stylesheet" href="story.css">
 <link rel="stylesheet" href="chatmoment.css">
+<link rel="stylesheet" href="usa.css">
 <link rel="stylesheet" href="score.css">
 </head>
 <body>
@@ -234,6 +235,200 @@
       </div>
     </section>
 
+<div id="usaFlow" class="is-hidden">
+<section class="screen fs" id="act">
+    <span class="eyebrow" style="margin-top:26px">Your first practice</span>
+    <div class="coach"><img class="av-img" src="assets/manager.png" alt="Your manager"><div><div class="cn">Miguel</div><div class="cr">your manager</div></div></div>
+    <div class="saybub"><span class="say-ctx" id="actCtx"></span><span class="say-q" id="actQ" data-en></span><span class="say-es" id="actEs" hidden></span></div>
+    <div id="actMode"></div>
+    <div class="fcta" style="align-items:center">
+      <div class="mic-row" id="micRow">
+        <span class="tip-bub" id="actTip">Answer in your own words</span>
+        <button class="micbtn" id="actMic"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="9" y="2.5" width="6" height="12" rx="3"/><path d="M5 11.5v.5a7 7 0 0 0 14 0v-.5M12 19.5V22M8 22h8" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg></button>
+        <button class="hint-bulb" id="actBulb" hidden aria-label="Get a hint"><span class="hint-tip">Can't find words? Try this</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5.76.76 1.23 1.52 1.41 2.5"/></svg></button>
+      </div>
+    </div>
+</section>
+<section class="screen fs" id="acthint">
+    <span class="eyebrow" style="margin-top:14px" id="ahEye">How to answer</span>
+    <p class="ah-ctx" id="ahCtx" hidden></p>
+    <h2 class="fq" style="font-size:21px;margin-top:8px" id="ahTitle">A simple 4-part answer.</h2>
+    <div class="scaf-progress"><i id="ahFill"></i></div>
+    <div class="scaf-card" id="ahCard" data-en></div>
+    <div class="fcta" style="align-items:center">
+      <button class="btn" id="ahNext">Next</button>
+      <div class="mic-row" id="ahMicRow" hidden>
+        <span class="tip-bub tip-bub--sm" id="ahTip">Tap the mic and read</span>
+        <button class="micbtn" id="ahMic" aria-label="Read aloud"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="9" y="2.5" width="6" height="12" rx="3"/><path d="M5 11.5v.5a7 7 0 0 0 14 0v-.5M12 19.5V22M8 22h8" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg></button>
+      </div>
+      <div class="pill-rec" id="ahPill" hidden>
+        <button class="pr-btn pr-x" id="ahX" aria-label="Restart reading"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+        <div class="pr-wave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        <button class="pr-btn pr-ok" id="ahOk" aria-label="Finish reading"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></button>
+      </div>
+      <button class="skip" id="ahPause" hidden style="margin-top:4px">Pause</button>
+    </div>
+  </section>
+<section class="screen fs" id="listen">
+    <span class="eyebrow" style="margin-top:26px">Your first practice</span>
+    <div class="coach"><img class="av-img" src="assets/sarah-avatar.png" alt="Sarah"><div><div class="cn">Sarah</div><div class="cr" id="lisState">listening…</div></div></div>
+    <div class="saybub"><span class="say-ctx" id="lisCtx"></span><span class="say-q" id="lisQ" data-en></span></div>
+    <div class="ctx-visual"><div class="timer" id="recTimer">0:00</div></div>
+    <div class="fcta" style="align-items:center">
+      <div class="pill-rec">
+        <button class="pr-btn pr-x" id="recX" aria-label="Discard answer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+        <div class="pr-wave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        <button class="pr-btn pr-ok" id="stopBtn" aria-label="Finish answer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></button>
+      </div>
+      <button class="skip" id="pauseLink" style="margin-top:4px">Pause</button>
+    </div>
+  </section>
+<section class="screen fs ctx" id="analysing">
+    <div class="ana-wrap">
+      <div class="ana-star">
+        <i class="ana-glow"></i>
+        <svg class="ana-s1" viewBox="0 0 64 64" aria-hidden="true">
+          <defs><linearGradient id="anaG" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#9E97FF"/><stop offset="1" stop-color="#6C63FF"/>
+          </linearGradient></defs>
+          <path d="M32 3 C34.4 19.6 44.4 29.6 61 32 C44.4 34.4 34.4 44.4 32 61 C29.6 44.4 19.6 34.4 3 32 C19.6 29.6 29.6 19.6 32 3 Z" fill="url(#anaG)"/>
+        </svg>
+      </div>
+      <p class="ana-line" id="anaLine"></p>
+      <div class="ana-bar"><i id="anaBar"></i></div>
+    </div>
+  </section>
+<section class="screen fs" id="hintscore">
+    <div class="hs-view" id="hsMeterView">
+      <div class="coach" style="margin-top:26px;align-items:flex-start"><img class="av-img" src="assets/sarah-avatar.png" alt="Sarah"><p class="hs-say" id="hsSay">You used the hint, so I scored your speech on pronunciation first. Here is where you stand.</p></div>
+      <div class="hs-stage">
+        <h2 class="fq hs-title" id="hsHead">Your<br>speech<br>level</h2>
+        <div class="hs-meterrow" id="hsMeterRow">
+          <div class="hs-bub" id="hsBub"><span id="hsPct">0%</span></div>
+          <div class="hs-track" id="hsTrack"></div>
+          <div class="hs-labels" id="hsLabels"></div>
+        </div>
+      </div>
+      <div class="fcta"><button class="btn" id="hsNext1" style="visibility:hidden">Continue</button></div>
+    </div>
+    <div class="hs-view" id="hsErrorsView" hidden>
+      <h2 class="fq" style="margin-top:40px">First, let's fix your<br><em>pronunciation</em>.</h2>
+      <p class="fsub" id="hsFixSub">Two words from your answer need work.</p>
+      <div class="scaf-card readmode hs-passage" id="hsPassage" data-en></div>
+      <div class="fcta"><button class="btn" id="hsFix">Let's correct them</button></div>
+    </div>
+    <div class="hs-view" id="hsPracticeView" hidden>
+      <p class="hs-state" id="hsState">Let’s practice this word</p>
+      <div class="scaf-progress"><i id="hsFill"></i></div>
+      <div class="scaf-card readmode hs-passage" id="hsPracPassage"></div>
+      <p class="hs-teach">Read the word <b>out loud</b></p>
+      <div class="pron-card" id="pronCard">
+        <i class="pc-burst" aria-hidden="true"></i><span class="pc-check" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+        <div class="pc-top">
+          <div><div class="pc-word" id="pcWord"></div><div class="pc-ph" id="pcPh"></div></div>
+          <div class="pc-play"><img src="assets/sarah-avatar.png" alt=""><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M8 9v6M4 10.5v3M16 7v10M20 9.5v5"/></svg></div>
+        </div>
+        <div class="pc-bottom">
+          <div class="pc-score"><b id="pcScore">52%</b><span>Current score</span></div>
+          <div class="pc-right">
+            <div class="pc-tip" id="pcTip"></div>
+            <button class="pc-btn" id="pcBtn"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="9" y="2.5" width="6" height="12" rx="3"/><path d="M5 11.5v.5a7 7 0 0 0 14 0v-.5M12 19.5V22M8 22h8" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg><span id="pcBtnT">Tap to speak</span></button>
+          </div>
+        </div>
+      </div>
+      <div class="fcta" style="align-items:center;margin-top:0"><button class="skip" id="pcSkip">Skip the word</button></div>
+    </div>
+    <div class="hs-view" id="hsDoneView" hidden>
+      <h2 class="fq" style="margin-top:56px;text-align:center">You took your <em>first step</em><br>into practicing English.</h2>
+      <p class="fsub" id="hsDoneSub" style="text-align:center;margin-top:10px"></p>
+      <div class="hs-traj">
+        <div id="hsTraj"></div>
+        <p class="hs-trajlab"><b>6 months</b> of daily practice takes you there.</p>
+      </div>
+      <div class="fcta"><button class="btn" id="hsGo">Build my plan</button></div>
+    </div>
+  </section>
+<section class="screen fs ctx" id="score">
+    <span class="eyebrow" style="margin-top:26px" id="scoreEyebrow">Your first score</span>
+    <div class="ctx-visual sc-body">
+      <div class="gauge"><svg width="0" height="0" style="position:absolute"><defs><linearGradient id="scg" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#6C63FF"/><stop offset="1" stop-color="#9E97FF"/></linearGradient></defs></svg>
+        <svg viewBox="0 0 220 164">
+          <path class="g-tr" d="M33.8 154A88 88 0 1 1 186.2 154"/>
+          <path class="g-fg" id="gFill" d="M33.8 154A88 88 0 1 1 186.2 154"/>
+        </svg>
+        <div class="g-mid"><span>Overall score</span><b id="scoreNum">0%</b></div>
+      </div>
+      <p class="sc-note" id="scoreNote"></p>
+      <div class="sc-head">See report</div>
+      <div class="sc-cards" id="scCards"></div>
+      <p class="fsub" id="scoreLine"></p>
+    </div>
+    <div class="fcta"><button class="btn" data-next="loader">Build my plan</button></div>
+  </section>
+<section class="screen fs ctx" id="loader">
+    <div class="ld-ring">
+      <svg viewBox="0 0 120 120"><circle class="ldr-bg" cx="60" cy="60" r="52"/><circle class="ldr-fg" cx="60" cy="60" r="52" id="ldArc"/></svg>
+      <div class="ldr-num" id="ldPct">0%</div>
+    </div>
+    <h2 class="fq" id="loaderHead" style="font-size:24px;margin-top:18px">Personalizing your plan</h2>
+    <div class="ld-steps" id="loaderChecks"></div>
+    <div class="ld-testi">
+      <div class="ldt-card" id="ldCard"></div>
+      <div class="ldt-dots" id="ldDots"></div>
+    </div>
+  </section>
+<section class="screen fs ctx" id="letter">
+    <h2 class="fq" style="margin-top:26px">Make it a promise.</h2>
+    <div class="ctx-visual" style="gap:18px">
+      <div class="letter"><div class="lh" id="letterHead"></div><div class="lb2" id="letterBody"></div><div class="ls" id="letterSign"></div></div>
+      <p class="fsub" id="pledgeLine" style="text-align:center"></p>
+      <div class="fingerp" id="fingerHold">
+        <span class="fp-stack">
+          <span class="fp-base"><svg viewBox="0 0 48 52" fill="none" stroke-width="1.7" stroke-linecap="round">
+            <path d="M24 24v7.5c0 4.2-.6 8.3-1.9 12.2"/>
+            <path d="M19.6 23.7a4.4 4.4 0 0 1 8.8 0v7.6c0 4.6-.7 9.1-2.1 13.4"/>
+            <path d="M15.2 23.6a8.8 8.8 0 0 1 17.6 0v7.7c0 4.9-.8 9.7-2.3 14.3"/>
+            <path d="M10.8 23.6a13.2 13.2 0 0 1 26.4 0v7.7c0 3.7-.4 7.3-1.3 10.8"/>
+            <path d="M6.4 29.6a17.6 17.6 0 0 1-.2-2.8v-3.2A17.8 17.8 0 0 1 15 8.2"/>
+            <path d="M20.5 4.6a17.8 17.8 0 0 1 21.1 15.1"/>
+            <path d="M7.6 36.4a17 17 0 0 1-.9-2.8"/>
+            <path d="M11.4 42.2a17.9 17.9 0 0 1-1.9-2.6"/>
+            <path d="M41.8 24.4v6.9c0 2.6-.2 5.2-.6 7.8"/>
+          </svg></span>
+          <span class="fp-lit"><svg viewBox="0 0 48 52" fill="none" stroke-width="1.7" stroke-linecap="round">
+            <path d="M24 24v7.5c0 4.2-.6 8.3-1.9 12.2"/>
+            <path d="M19.6 23.7a4.4 4.4 0 0 1 8.8 0v7.6c0 4.6-.7 9.1-2.1 13.4"/>
+            <path d="M15.2 23.6a8.8 8.8 0 0 1 17.6 0v7.7c0 4.9-.8 9.7-2.3 14.3"/>
+            <path d="M10.8 23.6a13.2 13.2 0 0 1 26.4 0v7.7c0 3.7-.4 7.3-1.3 10.8"/>
+            <path d="M6.4 29.6a17.6 17.6 0 0 1-.2-2.8v-3.2A17.8 17.8 0 0 1 15 8.2"/>
+            <path d="M20.5 4.6a17.8 17.8 0 0 1 21.1 15.1"/>
+            <path d="M7.6 36.4a17 17 0 0 1-.9-2.8"/>
+            <path d="M11.4 42.2a17.9 17.9 0 0 1-1.9-2.6"/>
+            <path d="M41.8 24.4v6.9c0 2.6-.2 5.2-.6 7.8"/>
+          </svg></span>
+        </span>
+      </div>
+      <p class="holdhint" id="holdHint">Press and hold to commit</p>
+    </div>
+    <div class="fcta"><button class="skip" data-next="paywall">Not now</button></div>
+    <div class="seal" id="seal" aria-hidden="true">
+      <i class="seal-bloom"></i>
+      <div class="seal-txt" id="sealTxt"><b>Commitment made</b><span id="sealSub"></span></div>
+    </div>
+  </section>
+<div class="mic-perm" id="micPerm" hidden>
+      <div class="ios-dialog">
+        <div class="iod-t">"Stimuler" Would Like to Access the Microphone</div>
+        <div class="iod-s">Sarah needs to hear you speak. That is the only thing it is used for.</div>
+        <div class="iod-row">
+          <button class="iod-btn" id="micDeny">Don't Allow</button>
+          <button class="iod-btn allow" id="micAllow">Allow</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
     <!-- ============ PROMISE ============ -->
     <section class="screen rs-screen is-hidden" id="promiseScreen">
       <div class="rs-inner pr-inner">
@@ -278,7 +473,7 @@
 
 <script src="story.js"></script>
 <script src="moment.js"></script>
-<script src="score.js"></script>
+<script src="usaflow.js"></script>
 <script src="flow.js"></script>
 </body>
 </html>

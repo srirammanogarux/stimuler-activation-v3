@@ -200,12 +200,8 @@ async function flow(){
   await sarah('Now we practise it live. As a first step, I want you to handle the very first situation you said you wanted to win.');
   await sarah('You’re about to meet someone.');
   await wait(400);
-  chatStream.appendChild(el(`<div class="meet-card">
-    <img src="assets/manager.png" alt="">
-    <div><p class="meet-n">${mo.role}</p><p class="meet-r">${mo.eyebrow} · ${mo.where}</p></div>
-  </div>`));
-  scrollToEnd();
-  await wait(1100);
+  await managerSays('Hi, I’m Miguel. Today, I’ll be acting as your manager. Come find me when you’re ready.');
+  await wait(300);
   await sarah('Before you walk in: do you want me to teach you how to handle him, or will you try it yourself?');
   const LEARN = { v:'learn', label:'Teach me how to handle it',
                   desc:'Learn it in 4 steps, then say it.' };
@@ -220,188 +216,60 @@ async function flow(){
   if (past('story')){ /* jumped beyond the story */ }
   else await window.playStory(A.room);
 
-  /* the moment: the USA practice screen */
+  /* the moment through the loader: the USA subsystem, verbatim */
   reach('moment');
-  let result;
-  if (past('moment')){
-    result = { path: A.mode === 'learn' ? 'read' : 'speak' };
-  } else {
-    result = await momentScreen(mo, A.mode);
-  }
-  A.path = result.path;
+  $('chatScreen').classList.add('is-hidden');
+  await window.enterUSA({ room: A.room, mode: A.mode, name: A.name, level: A.level });
 
-  /* results → loader → plan → promise → paywall */
+  /* the plan, then the letter, then the paywall */
   reach('score');
-  await window.playResults({
-    room: A.room, path: A.path, frame: mo.frame, name: A.name,
-  });
+  fillPlan();
+  ['storyScreen','planScreen'].forEach(id =>
+    $(id).classList.toggle('is-hidden', id !== 'planScreen'));
+  await new Promise(r => $('plCta').addEventListener('click', r, { once:true }));
+  $('planScreen').classList.add('is-hidden');
+  await window.usaLetter(A.name);
+  $('payScreen').classList.remove('is-hidden');
 }
 
-/* ============================================================
-   THE MOMENT — question up top, mic + hint bulb below.
-   learn mode goes straight to the teach screens.
-   ============================================================ */
-function momentScreen(mo, mode){
-  return new Promise(async resolve => {
-    if (mode === 'learn'){
-      await learnScreens(mo);
-      resolve({ path:'read' }); return;
-    }
-    $('mmQ').textContent = mo.q;
-    ['chatScreen','storyScreen'].forEach(id => $(id).classList.add('is-hidden'));
-    $('momentScreen').classList.remove('is-hidden');
-
-    const orb = $('mmOrb'), w = $('mmWave');
-    w.innerHTML = '';
-    for (let i = 0; i < 20; i++) w.appendChild(document.createElement('span'));
-    orb.classList.remove('live');
-    $('mmTip').textContent = 'Tap to speak';
-    $('mmTip').classList.remove('hidden');
-    $('mmTimer').classList.remove('on');
-    $('mmBulb').classList.remove('gone');
-    $('mmEscape').classList.remove('gone');
-    let wt = null, tt = null;
-
-    const leave = async path => {
-      clearInterval(wt); clearInterval(tt);
-      orb.onclick = null;
-      $('momentScreen').classList.add('is-hidden');
-      resolve({ path });
-    };
-
-    /* hint or escape: the teach screens take over, then the read */
-    const toLearn = async ({ skipTeach = false } = {}) => {
-      clearInterval(wt); clearInterval(tt);
-      orb.onclick = null;
-      $('momentScreen').classList.add('is-hidden');
-      await learnScreens(mo, { skipTeach });
-      resolve({ path:'read' });
-    };
-    $('mmBulb').onclick = () => toLearn();
-    $('mmEscape').onclick = () => toLearn();
-
-    orb.onclick = () => {
-      if (orb.classList.contains('live')) return;
-      orb.classList.add('live');
-      $('mmTip').classList.add('hidden');
-      $('mmBulb').classList.add('gone');
-      $('mmEscape').classList.add('gone');
-      $('mmTimer').classList.add('on');
-      const bars = [...w.children];
-      wt = setInterval(() => bars.forEach(b => b.style.height = (16 + Math.random() * 66) + '%'), 100);
-      const t0 = Date.now();
-      tt = setInterval(() => $('mmTimer').textContent = ((Date.now() - t0) / 1000).toFixed(1) + 's', 100);
-      $('mmOk').onclick = e => { e.stopPropagation(); leave('speak'); };
-      $('mmX').onclick = e => {
-        e.stopPropagation();
-        clearInterval(wt); clearInterval(tt);
-        orb.classList.remove('live');
-        $('mmTimer').classList.remove('on');
-        $('mmTip').classList.remove('hidden');
-        $('mmBulb').classList.remove('gone');
-        $('mmEscape').classList.remove('gone');
-      };
-    };
-  });
+/* the manager speaks in chat: gold judge bubble with his face */
+async function managerSays(text){
+  dimLast();
+  const row = el(`<div class="msg judge"><div class="dp"><img src="assets/manager.png" alt=""></div>
+    <div class="bubble"><p class="judge-name">Miguel · your manager</p><p>${text}</p></div></div>`);
+  chatStream.appendChild(row); scrollToEnd();
+  if (!FF) await wait(Math.max(1500, text.split(' ').length * 125));
 }
+
+/* the plan screen content (kept from the approved USA-anatomy port) */
+function fillPlan(){
+  const PLANS = {
+    manager:  { title:'Eight weeks to <em>ask without rehearsing</em>',
+      checks:['Asking for time off','Deadline conversations','Giving clear updates','Pushing back politely'],
+      done:'Talking to your manager', next:'Speaking up in meetings · Presenting my work' },
+    meetings: { title:'Eight weeks to <em>a voice the room waits for</em>',
+      checks:['Taking a position','Disagreeing without friction','Thinking aloud clearly','Bringing the room with you'],
+      done:'Speaking up in meetings', next:'Talking to my manager · Presenting my work' },
+    present:  { title:'Eight weeks to <em>presenting without freezing</em>',
+      checks:['Opening strong','Explaining the impact','Handling questions','Closing with next steps'],
+      done:'Presenting your work', next:'Talking to my manager · Speaking up in meetings' },
+  };
+  const pl = PLANS[A.room] || PLANS.manager;
+  $('plEyebrow').textContent = A.name ? `Your plan, ${A.name}` : 'Your plan';
+  $('plTitle').innerHTML = pl.title;
+  $('plSub').textContent = 'Built from what you showed today.';
+  $('plFrom').textContent = 'Today';
+  $('plChecks').innerHTML = pl.checks.map(c => `<li>${c}</li>`).join('');
+  $('plDone').textContent = '';
+  $('plDone').insertAdjacentText('beforeend', pl.done);
+  $('plNext').textContent = pl.next;
+}
+
 
 /* ============================================================
    THE MOMENT, IN CHAT
    ============================================================ */
 
-
-/* the learn screens: teach (4 steps, Next through them), then read.
-   skipTeach jumps straight to the read phase (hints already taught). */
-function learnScreens(mo, { skipTeach = false } = {}){
-  return new Promise(resolve => {
-    const card = $('lsCard');
-    const segs = mo.frame;
-    const text = segs.map(f => f.t).join(' ');
-    let i = 0;
-
-    $('chatScreen').classList.add('is-hidden');
-    $('learnScreen').classList.remove('is-hidden');
-
-    function paintTeach(){
-      $('lsEyebrow').textContent = 'How to answer';
-      $('lsTitle').textContent = 'A simple 4-part answer.';
-      $('lsProgFill').style.width = ((i + 1) / segs.length * 50) + '%';
-      card.classList.remove('readmode');
-      card.innerHTML = segs.map((f, k) =>
-        `<div class="seg ${k === i ? 'cur' : ''} ${k > i ? 'dim' : ''}">
-           <span class="st">${f.s}</span><p>${f.t}</p></div>`).join('');
-      $('lsCta').textContent = 'Continue';
-      $('lsCta').classList.remove('is-hidden');
-      $('lsMicRow').classList.add('is-hidden');
-    }
-
-    function paintRead(){
-      $('lsEyebrow').textContent = 'Try reading this';
-      $('lsTitle').textContent = '“' + mo.q + '”';
-      $('lsProgFill').style.width = '65%';
-      card.classList.add('readmode');
-      card.innerHTML = `<p class="rd-text"><span class="said"></span><span class="rest">${text}</span></p>`;
-      $('lsCta').classList.add('is-hidden');
-      $('lsMicRow').classList.remove('is-hidden');
-      armReadMic();
-    }
-
-    function armReadMic(){
-      const orb = $('lsOrb'), w = $('lsWave');
-      w.innerHTML = '';
-      for (let k = 0; k < 20; k++) w.appendChild(document.createElement('span'));
-      orb.classList.remove('live');
-      $('lsTip').classList.remove('hidden');
-      $('lsTimer').classList.remove('on');
-      let wt = null, tt = null, fill = null;
-      orb.onclick = () => {
-        if (orb.classList.contains('live')) return;
-        orb.classList.add('live');
-        $('lsTip').classList.add('hidden');
-        $('lsTimer').classList.add('on');
-        const bars = [...w.children];
-        wt = setInterval(() => bars.forEach(b => b.style.height = (16 + Math.random() * 66) + '%'), 100);
-        const t0 = Date.now();
-        tt = setInterval(() => $('lsTimer').textContent = ((Date.now() - t0) / 1000).toFixed(1) + 's', 100);
-        const said = card.querySelector('.said'), rest = card.querySelector('.rest');
-        const words = text.split(' ');
-        let n = 0;
-        fill = setInterval(() => {
-          if (n >= words.length){ clearInterval(fill); return; }
-          n++;
-          said.textContent = words.slice(0, n).join(' ') + ' ';
-          rest.textContent = words.slice(n).join(' ');
-        }, 300);
-        $('lsOk').onclick = e => {
-          e.stopPropagation();
-          clearInterval(wt); clearInterval(tt); clearInterval(fill);
-          orb.onclick = null;
-          $('learnScreen').classList.add('is-hidden');
-          $('chatScreen').classList.remove('is-hidden');
-          resolve({ path:'read' });
-        };
-        $('lsX').onclick = e => {
-          e.stopPropagation();
-          clearInterval(wt); clearInterval(tt); clearInterval(fill);
-          orb.classList.remove('live');
-          $('lsTimer').classList.remove('on');
-          $('lsTip').classList.remove('hidden');
-          card.querySelector('.said').textContent = '';
-          card.querySelector('.rest').textContent = text;
-          armReadMic();
-        };
-      };
-    }
-
-    if (skipTeach){ paintRead(); return; }
-    paintTeach();
-    $('lsCta').onclick = () => {
-      if (++i < segs.length){ paintTeach(); return; }
-      $('lsCta').onclick = null;
-      paintRead();
-    };
-  });
-}
 
 
 
