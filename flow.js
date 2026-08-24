@@ -198,9 +198,9 @@ async function flow(){
   setProgress(92, 'Almost ready');
   await sarah(`Perfect, ${A.name}. Time to practise it for real.`);
   await sarah('You’re about to meet Miguel. He’ll play your manager today, and nothing here counts. Nobody hears you but me.');
-  await sarah('Do you want me to walk you through the answer first, or will you give it a shot?');
   await wait(300);
   await managerSays(`Hi ${A.name}, I’m Miguel. Whenever you’re ready, come find me at my desk.`);
+  await sarah('So, would you like to start speaking with Miguel?');
   const LEARN = { v:'learn', label:'Walk me through it first',
                   desc:'Learn a simple 4-step answer, then say it.' };
   const TRY   = { v:'try',   label:'I’ll give it a shot',
