@@ -114,6 +114,20 @@
           <ul class="mo-steps" id="moSteps"></ul>
         </div>
 
+        <!-- beginner phase 1: one step at a time -->
+        <div class="mo-teach gone" id="moTeach">
+          <p class="mo-tn" id="moTeachN">Step 1 of 4</p>
+          <div class="mo-tcard">
+            <p class="mo-ts" id="moTeachS"></p>
+            <p class="mo-th" id="moTeachH"></p>
+            <p class="mo-tsample" id="moTeachT"></p>
+          </div>
+          <button class="mo-tnext" id="moTeachNext">Next</button>
+        </div>
+
+        <!-- beginner phase 2: the four steps, collapsed -->
+        <div class="mo-chips gone" id="moChips"></div>
+
         <div class="mo-read" id="moRead">
           <p class="mo-rl">Your answer — read it out loud</p>
           <p class="mo-rt" id="moRt"></p>
@@ -136,15 +150,17 @@
       </div>
     </section>
 
-    <!-- ============ SCORE ============ -->
+    <!-- ============ SCORE · India report anatomy ============ -->
     <section class="screen score-screen is-hidden" id="scoreScreen">
       <div class="sc-inner">
-        <p class="sc-eyebrow" id="scEyebrow"></p>
-        <div class="sc-ring"><span class="sc-num" id="scNum">0</span></div>
+        <p class="sc-eyebrow" id="scEyebrow">Your speech score</p>
+        <div class="sc-scorebar"><span class="sc-big" id="scNum">0</span><span class="sc-pct">%</span></div>
+        <div class="scaf-progress" id="scBar"><i id="scBarFill"></i></div>
         <p class="sc-open" id="scOpen"></p>
         <ul class="sc-report" id="scReport"></ul>
-        <p class="sc-drill-label" id="scDrillLabel"></p>
-        <div class="sc-words" id="scWords"></div>
+        <div class="hs-passage sc-passage" id="scPassage"><p id="scPassageText"></p></div>
+        <p class="hs-state" id="scState"></p>
+        <div id="scDrillZone"></div>
         <p class="sc-value is-off" id="scValue"></p>
         <button class="sc-cta is-off" id="scCta">See my journey</button>
       </div>

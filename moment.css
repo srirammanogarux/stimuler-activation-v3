@@ -117,3 +117,31 @@
 }
 .mo-bulb svg{width:23px;height:23px}
 .mo-bulb.gone{display:none}
+
+/* ---------- beginner teach phase ---------- */
+.mo-teach{display:flex;flex-direction:column;gap:12px;margin-bottom:14px}
+.mo-teach.gone,.mo-chips.gone{display:none}
+.mo-tn{font-family:var(--font-display);font-weight:700;font-size:11px;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--blue-300,#9D96FF)}
+.mo-tcard{
+  border-radius:18px;padding:20px 19px;
+  background:color-mix(in srgb,var(--accent) 10%,transparent);
+  border:1px solid color-mix(in srgb,var(--accent) 30%,transparent);
+  animation:msg-in .4s ease both;
+}
+@keyframes msg-in{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.mo-ts{font-family:var(--font-display);font-weight:700;font-size:19px;color:var(--text-hi);margin-bottom:7px}
+.mo-th{font-family:var(--font-display);font-size:14px;line-height:1.55;color:var(--text-low);margin-bottom:12px}
+.mo-tsample{font-family:var(--font-display);font-size:16px;line-height:1.5;
+  font-style:italic;color:var(--read-said)}
+.mo-tnext{align-self:flex-end;border:0;cursor:pointer;border-radius:999px;padding:11px 24px;
+  background:var(--accent);color:#fff;font-family:var(--font-display);font-weight:600;font-size:14px}
+
+/* the collapsed step chips */
+.mo-chips{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:14px}
+.mo-chip{display:flex;align-items:center;gap:6px;
+  background:var(--read-chip-bg);border:1px solid var(--read-chip-border);
+  border-radius:999px;padding:6px 12px 6px 6px;
+  font-family:var(--font-display);font-weight:600;font-size:12px;color:var(--text-mid)}
+.mo-chip i{width:17px;height:17px;border-radius:50%;display:grid;place-items:center;
+  background:var(--accent);color:#fff;font-style:normal;font-size:10px;font-weight:700}

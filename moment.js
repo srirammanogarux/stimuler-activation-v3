@@ -86,25 +86,59 @@ window.playMoment = function(roomId, level){
     $('moRt').innerHTML        = `<span class="said"></span><span class="rest">${answer}</span>`;
     $('moTip').textContent     = beginner ? MOMENT_TIPS.read : MOMENT_TIPS.speak;
 
-    /* beginner sees everything; int/adv starts bare with the bulb */
-    $('moFrame').classList.toggle('gone', !beginner);
-    $('moRead').style.display = beginner ? '' : 'none';
+    /* int/adv starts bare with the bulb; beginner gets the teach sequence */
+    $('moFrame').classList.add('gone');            /* the old stacked card stays off */
+    $('moRead').style.display = 'none';
     $('moBulb').classList.toggle('gone', beginner);
+    $('moTeach').classList.add('gone');
+    $('moChips').classList.add('gone');
+    document.querySelector('.mo-mic-row').style.visibility = beginner ? 'hidden' : '';
+
+    /* teach: one step at a time, then collapse to chips + answer + mic */
+    function teach(){
+      return new Promise(done => {
+        let i = 0;
+        $('moTeach').classList.remove('gone');
+        const paint = () => {
+          $('moTeachN').textContent = `Step ${i + 1} of ${mo.frame.length}`;
+          $('moTeachS').textContent = mo.frame[i].s;
+          $('moTeachH').textContent = mo.frame[i].h;
+          $('moTeachT').textContent = '“' + mo.frame[i].t + '”';
+          $('moTeachNext').textContent = i < mo.frame.length - 1 ? 'Next' : 'Got it';
+          const card = document.querySelector('.mo-tcard');
+          card.style.animation = 'none'; void card.offsetWidth; card.style.animation = '';
+        };
+        paint();
+        $('moTeachNext').onclick = () => {
+          if (++i < mo.frame.length){ paint(); return; }
+          $('moTeachNext').onclick = null;
+          $('moTeach').classList.add('gone');
+          $('moChips').innerHTML = mo.frame.map((f, k) =>
+            `<span class="mo-chip"><i>${k + 1}</i>${f.s}</span>`).join('');
+          $('moChips').classList.remove('gone');
+          $('moRead').style.display = '';
+          document.querySelector('.mo-mic-row').style.visibility = '';
+          done();
+        };
+      });
+    }
+    if (beginner) teach();
 
     $('moBulb').addEventListener('click', () => {
       hintUsed = true;
       $('moFrame').classList.toggle('gone');
     });
 
-    /* escape: switch this same screen to the beginner variant */
+    /* escape: switch this same screen to the beginner teach sequence */
     const onEscape = () => {
       path = 'read';
-      $('moFrame').classList.remove('gone');
-      $('moRead').style.display = '';
       $('moBulb').classList.add('gone');
+      $('moFrame').classList.add('gone');
       $('moTip').textContent = MOMENT_TIPS.read;
       $('moEscape').classList.add('gone');
       $('moInner').scrollTo({ top: 0, behavior: 'smooth' });
+      document.querySelector('.mo-mic-row').style.visibility = 'hidden';
+      teach();
     };
     $('moEscape').addEventListener('click', onEscape);
 

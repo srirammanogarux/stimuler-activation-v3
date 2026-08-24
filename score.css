@@ -10,13 +10,16 @@
 
 .sc-eyebrow{font-weight:600;font-size:12px;letter-spacing:.16em;text-transform:uppercase;
   color:var(--text-faint);margin-bottom:20px}
-.sc-ring{width:130px;height:130px;border-radius:50%;display:grid;place-items:center;
-  border:5px solid color-mix(in srgb,var(--progress) 55%,transparent);
-  box-shadow:0 0 50px color-mix(in srgb,var(--progress) 22%,transparent),
-             inset 0 0 30px color-mix(in srgb,var(--progress) 10%,transparent);
-  margin-bottom:20px}
-.sc-num{font-size:46px;font-weight:800;letter-spacing:-.02em;color:var(--progress);
+.sc-scorebar{display:flex;align-items:baseline;gap:3px;margin-bottom:2px}
+.sc-big{font-size:56px;font-weight:800;letter-spacing:-.02em;color:var(--text-hi);
   font-variant-numeric:tabular-nums}
+.sc-pct{font-size:22px;font-weight:700;color:var(--text-low)}
+.score-screen .scaf-progress{margin:0 0 22px;width:100%}
+.score-screen .scaf-progress.win i{background:linear-gradient(90deg,#2E7D52,#63E39B)}
+.sc-passage{margin:0 0 6px;width:100%;padding:22px 20px !important;text-align:left}
+.sc-passage p{font-family:var(--font-display);font-size:16.5px;line-height:1.75;color:var(--text-mid)}
+.score-screen .hs-state{margin:10px 0 16px}
+#scDrillZone{width:100%;text-align:left}
 .sc-open{font-size:16.5px;font-weight:600;line-height:1.5;color:var(--text-hi);
   margin-bottom:20px;max-width:30ch}
 
