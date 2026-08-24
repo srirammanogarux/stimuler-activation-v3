@@ -1,0 +1,119 @@
+/* ============================================================
+   Activation v3 · step 4 — the moment.
+   Full-screen speaking task, USA-onboarding anatomy:
+   asker row → speech bubble → framework card → mic row.
+   ============================================================ */
+
+.moment-screen{
+  background:
+    radial-gradient(120% 60% at 50% 0%,color-mix(in srgb,var(--accent) 14%,transparent) 0%,transparent 60%),
+    var(--bg);
+  padding:0 24px;
+  display:flex;flex-direction:column;
+}
+.mo-inner{flex:1;display:flex;flex-direction:column;padding-top:84px;padding-bottom:36px;overflow-y:auto;scrollbar-width:none}
+.mo-inner::-webkit-scrollbar{display:none}
+
+.mo-eyebrow{font-family:var(--font-display);font-weight:600;font-size:12px;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--progress);margin-bottom:16px}
+
+/* the asker */
+.mo-asker{display:flex;align-items:center;gap:11px;margin-bottom:14px}
+.mo-asker img{width:44px;height:44px;border-radius:50%;object-fit:cover;flex:none;
+  border:1.5px solid color-mix(in srgb,var(--progress) 55%,transparent)}
+.mo-an{font-family:var(--font-display);font-weight:600;font-size:14.5px;color:var(--text-hi)}
+.mo-ar{font-family:var(--font-display);font-size:12px;color:var(--text-low)}
+
+/* his line */
+.mo-bub{
+  background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.12);
+  border-radius:18px;border-top-left-radius:6px;padding:15px 17px;margin-bottom:16px;
+}
+.mo-ctx{display:block;font-family:var(--font-display);font-size:13px;color:var(--text-low)}
+.mo-q{display:block;margin-top:6px;font-family:var(--font-display);font-weight:600;
+  font-size:18px;line-height:1.45;color:var(--text-hi)}
+
+/* the framework card */
+.mo-frame{
+  border-radius:16px;padding:14px 16px;margin-bottom:14px;text-align:left;
+  background:color-mix(in srgb,var(--accent) 10%,transparent);
+  border:1px solid color-mix(in srgb,var(--accent) 30%,transparent);
+}
+.mo-frame.gone{display:none}
+.mo-ft{font-family:var(--font-display);font-weight:600;font-size:10.5px;
+  letter-spacing:.12em;text-transform:uppercase;color:var(--blue-300,#9D96FF);margin-bottom:10px}
+.mo-steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:9px}
+.mo-steps li{display:grid;grid-template-columns:20px 1fr;gap:10px;align-items:start}
+.mo-sn{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;
+  background:var(--accent);color:#fff;font-family:var(--font-display);
+  font-weight:700;font-size:11px;margin-top:1px}
+.mo-ss{font-family:var(--font-display);font-weight:600;font-size:13.5px;color:var(--text-hi)}
+.mo-sh{display:block;font-family:var(--font-display);font-weight:400;font-size:12.5px;
+  line-height:1.5;color:var(--text-low);margin-top:2px}
+
+/* the read-aloud answer (beginner) */
+.mo-read{
+  background:var(--read-bg);border:1px solid var(--read-border);border-radius:18px;
+  box-shadow:var(--read-glow);padding:15px 17px;margin-bottom:14px;
+}
+.mo-rl{font-family:var(--font-display);font-weight:700;font-size:10.5px;
+  letter-spacing:.13em;text-transform:uppercase;color:var(--read-label);margin-bottom:8px}
+.mo-rt{font-family:var(--font-display);font-size:16.5px;line-height:1.65;color:var(--read-rest)}
+.mo-rt .said{color:var(--read-said)}
+
+/* mic row */
+.mo-mic-row{margin-top:auto;position:relative;display:flex;flex-direction:column;align-items:center;padding-top:14px}
+.mo-tip{
+  position:relative;margin-bottom:14px;white-space:nowrap;
+  background:var(--accent);color:#fff;font-family:var(--font-display);
+  font-weight:600;font-size:12.5px;padding:8px 14px;border-radius:10px;
+  box-shadow:0 6px 16px -6px color-mix(in srgb,var(--accent) 50%,transparent);
+  transition:opacity .3s;
+}
+.mo-tip::after{content:'';position:absolute;top:100%;left:50%;
+  transform:translateX(-50%) translateY(-5px) rotate(45deg);
+  width:9px;height:9px;background:var(--accent)}
+.mo-tip.hidden{opacity:0}
+
+.mo-orb{
+  position:relative;width:74px;height:74px;border-radius:50%;cursor:pointer;user-select:none;
+  background:linear-gradient(180deg,var(--blue-300,#9D96FF),var(--accent));
+  display:grid;place-items:center;
+  box-shadow:0 0 0 9px color-mix(in srgb,var(--accent) 10%,transparent),
+             0 10px 26px -10px color-mix(in srgb,var(--accent) 45%,transparent);
+  transition:width .35s,border-radius .35s,transform .14s;
+}
+.mo-orb:active{transform:scale(.95)}
+.mo-orb svg{width:29px;height:29px;color:#fff}
+.mo-orb .wave,.mo-orb .x,.mo-orb .ok{display:none}
+.mo-orb.live{width:266px;border-radius:42px}
+.mo-orb.live>svg{display:none}
+.mo-orb.live .wave{display:flex;align-items:center;gap:3px;height:32px}
+.mo-orb .wave span{width:4px;height:22%;border-radius:2px;background:#fff;transition:height .1s}
+.mo-orb.live .x,.mo-orb.live .ok{
+  display:grid;place-items:center;position:absolute;top:50%;transform:translateY(-50%);
+  width:37px;height:37px;border-radius:50%;border:0;cursor:pointer;
+  font-family:var(--font-display);font-size:14px;font-weight:700;
+}
+.mo-orb.live .x{left:9px;background:rgba(0,0,0,.25);color:rgba(255,255,255,.85)}
+.mo-orb.live .ok{right:9px;background:#fff;color:var(--accent)}
+
+.mo-timer{margin-top:11px;font-family:var(--font-display);font-weight:600;font-size:13px;
+  letter-spacing:.04em;color:var(--progress);font-variant-numeric:tabular-nums;
+  opacity:0;transition:opacity .25s}
+.mo-timer.on{opacity:1}
+.mo-escape{margin-top:8px;border:0;background:none;cursor:pointer;
+  font-family:var(--font-display);font-size:13px;color:var(--text-faint);
+  text-decoration:underline;text-underline-offset:3px}
+.mo-escape:hover{color:var(--text-low)}
+.mo-escape.gone{visibility:hidden}
+
+/* hint bulb (int/adv) — sits beside the orb like the USA task */
+.mo-bulb{
+  position:absolute;left:calc(50% + 70px);bottom:64px;width:50px;height:50px;
+  border-radius:50%;border:1px solid rgba(255,255,255,.14);cursor:pointer;
+  background:rgba(255,255,255,.06);color:var(--blue-300,#9D96FF);
+  display:grid;place-items:center;
+}
+.mo-bulb svg{width:23px;height:23px}
+.mo-bulb.gone{display:none}

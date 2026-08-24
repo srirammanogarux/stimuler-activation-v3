@@ -142,10 +142,14 @@ async function flow(){
   await sarah(`Perfect, ${A.name}. Let’s make it real —`);
   await window.playStory(A.room, A.win);
 
+  /* the moment */
+  const result = await window.playMoment(A.room, A.win, A.level);
+  A.path = result.path;
+
   /* end of this build step */
-  document.getElementById('storyScreen').classList.add('is-hidden');
+  document.getElementById('momentScreen').classList.add('is-hidden');
   document.getElementById('chatScreen').classList.remove('is-hidden');
-  await sarah('<b>[ Next build step: the moment — the judge’s line and the mic. Not built yet. ]</b>');
+  await sarah(`<b>[ Next build step: the score — you ${A.path === 'read' ? 'read the answer' : 'spoke freely'}. Not built yet. ]</b>`);
 }
 
 flow();
