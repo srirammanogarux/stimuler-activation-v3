@@ -27,7 +27,7 @@ const STORY = {
       walk:     { eyebrow:'Monday · 9:58 am',    text:'okay… this time i speak.' },
     },
     tag: 'Say it before the moment passes.',
-    objective: 'Say what you think — and <b>be heard</b>',
+    objective: 'Say what you think, and <b>be heard</b>',
     timer: 'The decision lands in 5 minutes.',
   },
   present: {
@@ -43,17 +43,9 @@ const STORY = {
   },
 };
 
-const WIN_CARD = {
-  start:   { label:'Start without freezing up',      tip:'Don’t rehearse it in your head. Say the first line and the rest follows.' },
-  sustain: { label:'Say more than one nervous line', tip:'Aim for four short sentences. I’ll show you the four.' },
-  land:    { label:'Get to the point quickly',       tip:'Say the point first. The explanation comes second.' },
-  clear:   { label:'Be understood the first time',   tip:'Slower is clearer. Don’t rush the important words.' },
-};
-
-window.playStory = function(roomId, winId){
+window.playStory = function(roomId){
   return new Promise(resolve => {
     const st  = STORY[roomId] || STORY.manager;
-    const win = WIN_CARD[winId] || WIN_CARD.sustain;
     const $   = id => document.getElementById(id);
     const screen = $('storyScreen');
 
@@ -61,8 +53,8 @@ window.playStory = function(roomId, winId){
     $('stThem').textContent      = st.them;
     $('stTag').textContent       = st.tag;
     $('smObjective').innerHTML   = st.objective;
-    $('smWin').textContent       = win.label;
-    $('smTip').textContent       = win.tip;
+    $('smStars').innerHTML       = (window.momentFrame ? window.momentFrame(roomId) : [])
+      .map(f => `<li><span class="star">★</span>${f.s}</li>`).join('');
     $('smTimer').textContent     = st.timer;
 
     const beats = [

@@ -33,8 +33,10 @@ async function sarah(text, typingMs = 680){
   await wait(typingMs);
   const b = row.querySelector('.bubble');
   b.classList.remove('typing'); b.innerHTML = `<p>${text}</p>`;
+  row.classList.add('speaking');
   scrollToEnd();
   await wait(Math.max(900, text.split(' ').length * 118));
+  row.classList.remove('speaking');
 }
 function userChip(label){
   chatStream.appendChild(el(`<div class="chip-row"><div class="chip">${label}</div></div>`));
@@ -87,12 +89,19 @@ async function flow(){
   await wait(500);
 
   /* intro */
-  await sarah('Hey! I’m Sarah. I’m here to help you speak English with confidence — in the moments that actually matter to you.');
+  await sarah('Hey! I’m Sarah. I’m here to help you speak English with confidence, in the moments that actually matter to you.');
 
   /* 1 · native language */
   setProgress(10, '10% completed');
-  await sarah('First — what’s your native language?');
-  A.lang = await options([{ v:'es', label:'Spanish' }]);
+  await sarah('First, what’s your native language?');
+  A.lang = await options([
+    { v:'es', label:'Spanish' },
+    { v:'pt', label:'Portuguese' },
+    { v:'id', label:'Indonesian' },
+    { v:'hi', label:'Hindi' },
+    { v:'fr', label:'French' },
+    { v:'ar', label:'Arabic' },
+  ]);
 
   /* 2 · name */
   setProgress(22, '22% completed');
@@ -102,24 +111,53 @@ async function flow(){
   /* 3 · goal */
   setProgress(36, 'Your goal');
   await sarah(`Good to meet you, ${A.name}. What are you learning English for?`);
-  A.goal = await options([{ v:'career', label:'Grow in my career' }]);
+  A.goal = await options([
+    { v:'exam',     label:'Prepare for an English exam' },
+    { v:'career',   label:'Grow in my career' },
+    { v:'personal', label:'Personal growth' },
+    { v:'school',   label:'Excel at my school' },
+    { v:'travel',   label:'Travel confidently' },
+  ]);
 
   /* 4 · situation */
   setProgress(50, '50% completed');
   await sarah('And what’s your situation right now?');
-  A.situation = await options([{ v:'office', label:'Working a job' }]);
-
-  /* 5 · scenario */
-  setProgress(64, 'Almost there');
-  await sarah('Work, then. Where do you want to win first?');
-  A.room = await options([
-    { v:'manager',  label:'Talking to my manager' },
-    { v:'meetings', label:'Speaking up in meetings' },
-    { v:'present',  label:'Presenting my work' },
+  A.situation = await options([
+    { v:'student',    label:'Studying' },
+    { v:'office',     label:'Working a job' },
+    { v:'freelancer', label:'Freelancing' },
+    { v:'business',   label:'Running my own business' },
+    { v:'home',       label:'At home with family' },
+    { v:'break',      label:'On a career break' },
+    { v:'jobseek',    label:'Looking for work' },
   ]);
 
+  /* only career + working-a-job is built end to end */
+  if (!(A.goal === 'career' && A.situation === 'office')){
+    await sarah('That path isn’t built in this prototype yet. The working flow is <b>Grow in my career</b> + <b>Working a job</b>.');
+    chatStream.appendChild(el('<div class="options"><button class="opt" onclick="location.reload()"><span class="opt-label">↺ Start again</span></button></div>'));
+    scrollToEnd();
+    return;
+  }
+
+  /* 5 · scenario */
+  setProgress(66, 'Almost there');
+  await sarah('Work, then. Which of these do you want to handle with ease first?');
+  const ROOM_OPTS = [
+    { v:'manager',  label:'Talking to my manager',      built:true },
+    { v:'meetings', label:'Speaking up in meetings',    built:true },
+    { v:'present',  label:'Presenting my work',         built:true },
+    { v:'client',   label:'Handling client calls',      built:false },
+    { v:'smalltalk',label:'Small talk with colleagues', built:false },
+  ];
+  A.room = await options(ROOM_OPTS);
+  while (!ROOM_OPTS.find(r => r.v === A.room).built){
+    await sarah('That one’s coming soon. Pick another for now.');
+    A.room = await options(ROOM_OPTS);
+  }
+
   /* 6 · level */
-  setProgress(78, '78% completed');
+  setProgress(84, '84% completed');
   await sarah('How would you describe your English right now?');
   A.level = await options([
     { v:'beginner',     label:'Beginner',     desc:'I know some words, but I can’t make sentences.' },
@@ -127,28 +165,18 @@ async function flow(){
     { v:'advanced',     label:'Advanced',     desc:'I can hold a short conversation and understand others.' },
   ]);
 
-  /* 7 · the win */
-  setProgress(90, 'One last thing');
-  await sarah('Last one. In that moment — what’s the one thing you want to get right?');
-  A.win = await options([
-    { v:'start',   label:'Start without freezing up' },
-    { v:'sustain', label:'Say more than one nervous line' },
-    { v:'land',    label:'Get to the point quickly' },
-    { v:'clear',   label:'Be understood the first time' },
-  ]);
-
   /* the story */
   setProgress(100, 'Your first scenario');
-  await sarah(`Perfect, ${A.name}. Let’s make it real —`);
-  await window.playStory(A.room, A.win);
+  await sarah(`Perfect, ${A.name}. Let’s make your first scenario real.`);
+  await window.playStory(A.room);
 
   /* the moment */
-  const result = await window.playMoment(A.room, A.win, A.level);
+  const result = await window.playMoment(A.room, A.level);
   A.path = result.path;
 
   /* the score → journey → paywall */
   await window.playScore({
-    room: A.room, win: A.win, path: A.path, hintUsed: result.hintUsed,
+    room: A.room, path: A.path, hintUsed: result.hintUsed,
     frame: window.momentFrame(A.room), name: A.name,
   });
 }

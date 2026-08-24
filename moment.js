@@ -12,7 +12,7 @@ const MOMENT = {
   manager: {
     eyebrow: 'Talking to your manager',
     role: 'Your manager · between meetings',
-    ctx: 'He looks up from his laptop —',
+    ctx: 'He looks up from his laptop.',
     q: 'Yeah, I heard you want a day off next week. What’s it about?',
     frame: [
       { s:'Make the ask',    h:'Name the exact day, straight away.',
@@ -28,7 +28,7 @@ const MOMENT = {
   meetings: {
     eyebrow: 'Speaking up in meetings',
     role: 'Your manager · at the team sync',
-    ctx: 'The room goes quiet. He turns to you —',
+    ctx: 'The room goes quiet. He turns to you.',
     q: 'We’re leaning towards option A. Thoughts?',
     frame: [
       { s:'Take a position',   h:'Say which option, straight away. No wind-up.',
@@ -44,8 +44,8 @@ const MOMENT = {
   present: {
     eyebrow: 'Presenting your work',
     role: 'Your manager · at the demo',
-    ctx: 'Your work is on the screen. Everyone waits —',
-    q: 'Alright — walk us through it.',
+    ctx: 'Your work is on the screen. Everyone waits.',
+    q: 'Alright, walk us through it.',
     frame: [
       { s:'Say what it is',       h:'One plain sentence. No preamble.',
         t:'This is the new order-tracking screen.' },
@@ -60,16 +60,13 @@ const MOMENT = {
 };
 
 const MOMENT_TIPS = {
-  start:   'Don’t plan it. Just start — the first line is enough.',
-  sustain: 'Aim for four short sentences, not one.',
-  land:    'Say the point first. Explain after.',
-  clear:   'Slower is clearer. Don’t rush it.',
-  read:    'Just read it. Nobody hears this but you.',
+  speak: 'Say it like you would in the room. Nobody hears this but you.',
+  read:  'Just read it. Nobody hears this but you.',
 };
 
 window.momentFrame = roomId => (MOMENT[roomId] || MOMENT.manager).frame;
 
-window.playMoment = function(roomId, winId, level){
+window.playMoment = function(roomId, level){
   return new Promise(resolve => {
     const $  = id => document.getElementById(id);
     const mo = MOMENT[roomId] || MOMENT.manager;
@@ -87,7 +84,7 @@ window.playMoment = function(roomId, winId, level){
       <div><span class="mo-ss">${f.s}</span><span class="mo-sh">${f.h}</span></div></li>`).join('');
     const answer = mo.frame.map(f => f.t).join(' ');
     $('moRt').innerHTML        = `<span class="said"></span><span class="rest">${answer}</span>`;
-    $('moTip').textContent     = beginner ? MOMENT_TIPS.read : (MOMENT_TIPS[winId] || MOMENT_TIPS.sustain);
+    $('moTip').textContent     = beginner ? MOMENT_TIPS.read : MOMENT_TIPS.speak;
 
     /* beginner sees everything; int/adv starts bare with the bulb */
     $('moFrame').classList.toggle('gone', !beginner);
