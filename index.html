@@ -9,6 +9,7 @@
 <link rel="stylesheet" href="styles.css">
 <link rel="stylesheet" href="story.css">
 <link rel="stylesheet" href="moment.css">
+<link rel="stylesheet" href="score.css">
 </head>
 <body>
 <div class="stage">
@@ -136,12 +137,51 @@
       </div>
     </section>
 
+    <!-- ============ SCORE ============ -->
+    <section class="screen score-screen is-hidden" id="scoreScreen">
+      <div class="sc-inner">
+        <p class="sc-eyebrow" id="scEyebrow"></p>
+        <div class="sc-ring"><span class="sc-num" id="scNum">0</span></div>
+        <p class="sc-open" id="scOpen"></p>
+        <ul class="sc-report" id="scReport"></ul>
+        <p class="sc-drill-label" id="scDrillLabel"></p>
+        <div class="sc-words" id="scWords"></div>
+        <p class="sc-value is-off" id="scValue"></p>
+        <button class="sc-cta is-off" id="scCta">See my journey</button>
+      </div>
+    </section>
+
+    <!-- ============ JOURNEY ============ -->
+    <section class="screen journey-screen is-hidden" id="journeyScreen">
+      <div class="jn-inner">
+        <p class="sc-eyebrow">Your next 8 weeks</p>
+        <h2 class="jn-title" id="jnTitle"></h2>
+        <div class="jn-rows" id="jnRows"></div>
+        <button class="jn-cta" id="jnCta">I’m ready</button>
+      </div>
+    </section>
+
+    <!-- ============ PAYWALL (stub) ============ -->
+    <section class="screen pay-screen is-hidden" id="payScreen">
+      <div class="pw-inner">
+        <h2 class="pw-title"><em>Grow in your career</em><br>with English practice</h2>
+        <div class="pw-card">
+          <p class="pw-plan">PRO Yearly</p>
+          <p class="pw-price"><s>MX$1398</s> <b>MX$699</b></p>
+          <p class="pw-note">Just MX$58 a month, paid once a year</p>
+        </div>
+        <button class="pw-cta">Get Stimuler PRO</button>
+        <button class="pw-restart" onclick="location.reload()">↺ Run the flow again</button>
+      </div>
+    </section>
+
   </div>
   </div>
 </div>
 
 <script src="story.js"></script>
 <script src="moment.js"></script>
+<script src="score.js"></script>
 <script src="flow.js"></script>
 </body>
 </html>

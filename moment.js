@@ -67,12 +67,15 @@ const MOMENT_TIPS = {
   read:    'Just read it. Nobody hears this but you.',
 };
 
+window.momentFrame = roomId => (MOMENT[roomId] || MOMENT.manager).frame;
+
 window.playMoment = function(roomId, winId, level){
   return new Promise(resolve => {
     const $  = id => document.getElementById(id);
     const mo = MOMENT[roomId] || MOMENT.manager;
     const beginner = level === 'beginner';
     let path = beginner ? 'read' : 'speak';
+    let hintUsed = false;
 
     /* fill the slots */
     $('moEyebrow').textContent = mo.eyebrow;
@@ -92,6 +95,7 @@ window.playMoment = function(roomId, winId, level){
     $('moBulb').classList.toggle('gone', beginner);
 
     $('moBulb').addEventListener('click', () => {
+      hintUsed = true;
       $('moFrame').classList.toggle('gone');
     });
 
@@ -146,7 +150,7 @@ window.playMoment = function(roomId, winId, level){
       $('moOk').addEventListener('click', e => {
         e.stopPropagation();
         clearInterval(waveT); clearInterval(tickT);
-        resolve({ path });
+        resolve({ path, hintUsed });
       }, { once:true });
       $('moX').addEventListener('click', e => {
         e.stopPropagation();

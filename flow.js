@@ -146,10 +146,11 @@ async function flow(){
   const result = await window.playMoment(A.room, A.win, A.level);
   A.path = result.path;
 
-  /* end of this build step */
-  document.getElementById('momentScreen').classList.add('is-hidden');
-  document.getElementById('chatScreen').classList.remove('is-hidden');
-  await sarah(`<b>[ Next build step: the score — you ${A.path === 'read' ? 'read the answer' : 'spoke freely'}. Not built yet. ]</b>`);
+  /* the score → journey → paywall */
+  await window.playScore({
+    room: A.room, win: A.win, path: A.path, hintUsed: result.hintUsed,
+    frame: window.momentFrame(A.room), name: A.name,
+  });
 }
 
 flow();
