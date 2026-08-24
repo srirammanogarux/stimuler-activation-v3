@@ -3,18 +3,20 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Stimuler · Activation v3 · At Work</title>
+<title>Stimuler · Activation v3</title>
 <link rel="stylesheet" href="fonts.css">
 <link rel="stylesheet" href="tokens.css">
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 <div class="stage">
+  <div class="mockup" id="mockup">
   <div class="phone" id="phone">
+    <div class="ambient"></div>
 
-    <!-- ============ CHAT ============ -->
+    <!-- ============ CHAT SHELL · the India onboarding UI ============ -->
     <main class="screen chat-screen" id="chatScreen">
-      <header class="topbar">
+      <header class="topbar" id="topbar">
         <div class="statusbar">
           <img src="assets/status-time.svg" alt="9:41" width="54" height="21">
           <img src="assets/status-right.svg" alt="" width="67" height="12">
@@ -29,8 +31,8 @@
         <div class="chat-stream" id="chatStream"></div>
       </div>
 
-      <footer class="bottombar">
-        <button class="pill pill-mute" disabled aria-disabled="true">
+      <footer class="bottombar" id="bottomBar">
+        <button class="pill pill-mute muted" id="muteBtn" disabled aria-disabled="true">
           <img src="assets/mic-mute.svg" alt=""> Mute
         </button>
         <button class="pill pill-skip" id="skipBtn">
@@ -38,131 +40,13 @@
         </button>
       </footer>
 
-      <!-- mic: count UP, with the quiet exit -->
-      <div class="mic-area gone" id="micArea">
-        <p class="mic-tip" id="micTip">Tap to speak</p>
-        <div class="mic-orb idle" id="micOrb">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/><line x1="12" y1="18" x2="12" y2="22"/></svg>
-          <div class="mic-wave" id="micWave"></div>
-          <button class="mic-x" id="micX" aria-label="Cancel">✕</button>
-          <button class="mic-ok" id="micOk" aria-label="Done">✓</button>
-        </div>
-        <p class="mic-timer" id="micTimer">0.0s</p>
-        <button class="mic-escape" id="micEscape">I can’t speak right now</button>
-      </div>
-
       <div class="home-indicator"></div>
     </main>
 
-    <!-- ============ STORY · 3 beats, one office ============ -->
-    <section class="screen story-screen is-hidden" id="storyScreen">
-      <div class="story-dots"><i id="dot1"></i><i id="dot2"></i><i id="dot3"></i></div>
-
-      <!-- beat 1 · the office -->
-      <div class="beat beat-1" id="beat1">
-        <div class="office">
-          <div class="of-wall"></div>
-          <div class="of-window"><i></i><i></i></div>
-          <div class="of-frame"></div>
-          <div class="of-plant"><i></i><i></i><i></i></div>
-          <div class="of-desk"></div>
-          <div class="of-laptop"></div>
-          <img class="of-manager" id="b1Manager" src="assets/manager.png" alt="">
-        </div>
-        <p class="b1-eyebrow" id="b1Eyebrow"></p>
-        <h2 class="b1-place" id="b1Place"></h2>
-        <p class="b1-line" id="b1Line"></p>
-      </div>
-
-      <!-- beat 2 · the clash (pure code) -->
-      <div class="beat beat-2 is-off" id="beat2">
-        <div class="clash-half clash-l"></div>
-        <div class="clash-half clash-r"></div>
-        <div class="fighter f-you">
-          <div class="f-circle"><img src="assets/you.png" alt=""></div>
-          <p>YOU</p>
-        </div>
-        <div class="fighter f-them">
-          <div class="f-circle"><img src="assets/manager.png" alt=""></div>
-          <p id="b2Them">THE MANAGER</p>
-        </div>
-        <div class="vs-wrap"><span class="vs">VS</span>
-          <svg class="bolt" viewBox="0 0 24 24"><path d="M13 2 4.5 13.5h5L9.5 22 19 9.5h-5.5L13 2Z"/></svg>
-        </div>
-        <p class="clash-tag" id="b2Tag"></p>
-        <div class="flash" id="flash"></div>
-      </div>
-
-      <!-- beat 3 · the win card -->
-      <div class="beat beat-3 is-off" id="beat3">
-        <p class="b3-label">Your mission</p>
-        <h2 class="b3-objective" id="b3Objective"></h2>
-        <div class="b3-win"><span class="star">★</span><span id="b3Win"></span></div>
-        <p class="b3-tip" id="b3Tip"></p>
-        <p class="b3-timer" id="b3Timer"></p>
-        <button class="cta" id="b3Cta">Start</button>
-      </div>
-    </section>
-
-    <!-- ============ SCORE + DRILL ============ -->
-    <section class="screen score-screen is-hidden" id="scoreScreen">
-      <div class="sc-inner">
-        <p class="sc-eyebrow">Your speech score</p>
-        <div class="sc-ring"><span class="sc-num" id="scNum">0</span></div>
-        <p class="sc-open" id="scOpen"></p>
-        <ul class="sc-beats" id="scBeats"></ul>
-
-        <div class="sc-drill" id="scDrill">
-          <p class="sc-drill-label">Two words to sharpen — tap and say each one</p>
-          <div class="sc-words" id="scWords"></div>
-        </div>
-
-        <p class="sc-value is-off" id="scValue"></p>
-        <button class="cta is-off" id="scCta">See my journey</button>
-      </div>
-    </section>
-
-    <!-- ============ JOURNEY ============ -->
-    <section class="screen journey-screen is-hidden" id="journeyScreen">
-      <div class="jn-inner">
-        <p class="sc-eyebrow">Your next 8 weeks</p>
-        <h2 class="jn-title">You took the first step<br>five minutes ago.</h2>
-        <div class="jn-rows" id="jnRows"></div>
-        <button class="cta" id="jnCta">I’m ready</button>
-      </div>
-    </section>
-
-    <!-- ============ PAYWALL (stub) ============ -->
-    <section class="screen pay-screen is-hidden" id="payScreen">
-      <div class="pw-inner">
-        <h2 class="pw-title" id="pwTitle"></h2>
-        <div class="pw-card">
-          <p class="pw-plan">PRO Yearly</p>
-          <p class="pw-price"><s>MX$1398</s> <b>MX$699</b></p>
-          <p class="pw-note">Just MX$58 a month, paid once a year</p>
-        </div>
-        <button class="cta" id="pwCta"></button>
-        <button class="link" id="pwRestart">↺ Run the flow again</button>
-      </div>
-    </section>
-
   </div>
-
-  <!-- ============ REVIEW PANEL ============ -->
-  <aside class="devpanel">
-    <h2>Activation v3 · At Work</h2>
-    <p class="dp-note">Three scenarios, one office. Every answer lives in the URL — change a chip and the flow replays.</p>
-    <div class="dp-group"><h3>Goal</h3><div class="dp-chips" id="dpGoal"></div></div>
-    <div class="dp-group"><h3>Situation</h3><div class="dp-chips" id="dpSit"></div></div>
-    <div class="dp-group"><h3>Scenario</h3><div class="dp-chips" id="dpRoom"></div></div>
-    <div class="dp-group"><h3>Level</h3><div class="dp-chips" id="dpLvl"></div></div>
-    <div class="dp-group"><h3>Win</h3><div class="dp-chips" id="dpWin"></div></div>
-    <div class="dp-group"><h3>Jump to</h3><div class="dp-chips" id="dpStep"></div></div>
-    <div class="dp-resolved" id="dpResolved"></div>
-  </aside>
+  </div>
 </div>
 
-<script src="content.js"></script>
-<script src="app.js"></script>
+<script src="shell.js"></script>
 </body>
 </html>
