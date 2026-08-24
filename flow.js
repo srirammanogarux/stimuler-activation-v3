@@ -204,10 +204,11 @@ async function flow(){
   await wait(300);
   await sarah('That’s the conversation most people rehearse in their head for days. Today you actually get to try it.');
   await sarah('And nothing here counts. Nobody hears you but me.');
+  await managerSays('Whenever you’re ready, come find me at my desk.');
   await sarah('So, how do you want to go in?');
   const LEARN = { v:'learn', label:'Walk me through it first',
                   desc:'Learn a simple 4-step answer, then say it.' };
-  const TRY   = { v:'try',   label:'Let me just try',
+  const TRY   = { v:'try',   label:'I’ll give it a shot',
                   desc:'Speak your way. A hint is one tap away.' };
   A.mode = await options(A.level === 'beginner' ? [LEARN, TRY] : [TRY, LEARN], DBG.mode || (A.level === 'beginner' ? 'learn' : 'try'));
 
